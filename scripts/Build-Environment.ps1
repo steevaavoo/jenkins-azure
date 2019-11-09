@@ -1,1 +1,1 @@
-az group create --location $env:RG_NAME --name $env:LOCATION
+az group create --location $env:LOCATION --name $env:RG_NAME
