@@ -9,7 +9,7 @@ pipeline {
     DNS_DOMAIN_NAME = 'bakers-foundry.co.uk'
     DNS_IP_ADDRESS = 'AssignedBy_Wait-LoadbalancerIP.ps1'
     LOCATION = 'eastus'
-    TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestv09f79'
+    TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
   }
 
