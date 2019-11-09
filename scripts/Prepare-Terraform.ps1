@@ -14,7 +14,7 @@ $targetFiles = (Get-ChildItem -Path $targetFilePattern)
 
 # Replace tokens
 foreach ($targetFile in $targetFiles) {
-    foreach ($item in $replaceHash.GetEnumerator()) {
+    foreach ($item in $envVarHash.GetEnumerator()) {
         ((Get-Content -Path $targetFile -Raw) -replace $item.key, $item.value) | Set-Content -Path $targetFile
     }
 }
