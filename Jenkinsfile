@@ -19,6 +19,7 @@ pipeline {
         withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal('azure-jenkins')]) {
           pwsh(script: './scripts/Build-Environment.ps1')
           pwsh(script: './scripts/Prepare-Terraform.ps1')
+          pwsh(script: './scripts/Invoke-Terraform.ps1')
         }
       }
     }
