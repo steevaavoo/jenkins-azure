@@ -1,4 +1,2 @@
-ls env:
-Write-Host "Pre Command"
+Write-Output "Hello World Output"
 az account list
-Write-Host "Post Command"

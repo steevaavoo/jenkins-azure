@@ -13,7 +13,7 @@ pipeline {
         // azureCLI commands: [[exportVariablesString: '', script: 'az account list'], [exportVariablesString: '', script: 'az resource list']], principalCredentialId: 'azure-jenkins'
 
         withCredentials([azureServicePrincipal('azure-jenkins')]) {
-          pwsh(script: './scripts/Build-Environment.ps1', returnStdout: false, returnStatus: true)
+          pwsh(script: './scripts/Build-Environment.ps1')
         }
 
       }
