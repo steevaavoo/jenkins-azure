@@ -1,2 +1,1 @@
-Write-Output "Hello World Output"
-az account list
+az group create --location $env:RG_NAME --name $env:LOCATION

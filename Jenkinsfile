@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    rg_name = 'test-rg'
-    location = 'eastus'
+    RG_NAME = 'test-rg'
+    LOCATION = 'eastus'
   }
 
   stages {
@@ -11,6 +11,7 @@ pipeline {
       steps {
         withCredentials([azureServicePrincipal('azure-jenkins')]) {
           pwsh(script: './scripts/Build-Environment.ps1')
+          pwsh(script: './scripts/Multi.ps1')
         }
       }
     }
