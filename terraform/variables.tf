@@ -16,7 +16,7 @@ variable "aks_dns_prefix" {
 }
 
 variable "azure_resourcegroup_name" {
-  default = "__aksrgname__"
+  default = "__TERRAFORM_STORAGE_RG__"
 }
 
 variable "location" {
@@ -28,7 +28,7 @@ variable "agent_pool_count" {
 }
 
 variable "azurerm_kubernetes_cluster_name" {
-  default = "__aksclustername__"
+  default = "__AKS_CLUSTER_NAME__"
 }
 
 variable "agent_pool_profile_name" {
@@ -48,10 +48,9 @@ variable "agent_pool_profile_disk_size_gb" {
 }
 
 variable "service_principal_client_id" {
-  default = "__clientid__"
+  default = "__AZURE_CLIENT_ID__"
 }
 
 variable "service_principal_client_secret" {
-  default = "__clientsecret__"
+  default = "__AZURE_CLIENT_SECRET__"
 }
-

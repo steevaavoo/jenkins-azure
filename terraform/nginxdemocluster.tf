@@ -1,11 +1,11 @@
 # Deploying Terraform Remote State to AZ Storage Container
 terraform {
-  required_version = ">= 0.11"
+  required_version = ">= 0.12"
   backend "azurerm" {
-    storage_account_name = "__terraformstorageaccount__"
-    container_name       = "__tf_container_name__"
+    storage_account_name = "__TERRAFORM_STORAGE_ACCOUNT__"
+    container_name       = "terraform"
     key                  = "terraform.tfstate"
-    access_key           = "__storagekey__"
+    access_key           = "__STORAGE_KEY__"
   }
 }
 resource "azurerm_resource_group" "stvrg" {
