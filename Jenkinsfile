@@ -10,7 +10,6 @@ pipeline {
     AKS_RG_NAME = 'stvRG1'
     STORAGE_KEY = 'willbefetchedbyscript'
     TF_KEY = 'terraform.tfstate'
-    TF_CONTAINER_NAME = 'terraform'
     DNS_DOMAIN_NAME = 'bakers-foundry.co.uk'
     DNS_IP_ADDRESS = 'AssignedBy_Wait-LoadbalancerIP.ps1'
   }
