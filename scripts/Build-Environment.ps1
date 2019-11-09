@@ -1,4 +1,4 @@
-
+ls env:
 # This will create an Azure resource group, Storage account and Storage container, used to store terraform remote state
 #
 # When using Windows agent in Azure DevOps, use batch scripting.
