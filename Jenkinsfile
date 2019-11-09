@@ -7,10 +7,10 @@ pipeline {
   }
 
   stages {
-    withCredentials([azureServicePrincipal('azure-jenkins')]) {
-      stage('Build') {
+    stage('Build') {
+      withCredentials([azureServicePrincipal('azure-jenkins')]) {
         steps {
-            pwsh(script: './scripts/Build-Environment.ps1')
+          pwsh(script: './scripts/Build-Environment.ps1')
         }
       }
     }
