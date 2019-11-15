@@ -34,7 +34,7 @@ pipeline {
       steps {
         withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
           pwsh(script: './scripts/Create-AzStorage.ps1')
-          pwsh(script: './scripts/Get-StorageKey.ps1', './scripts/Replace-Tokens.ps1')
+          pwsh(script: './scripts/Get-StorageKey.ps1 ; ./scripts/Replace-Tokens.ps1')
           // pwsh(script: './scripts/Replace-Tokens.ps1')
           pwsh(script: './scripts/Init-Terraform.ps1')
         }
