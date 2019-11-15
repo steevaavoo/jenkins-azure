@@ -1,4 +1,9 @@
 pipeline {
+
+  parameters {
+    booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
+  }
+
   agent any
 
   environment {
@@ -27,6 +32,7 @@ pipeline {
 
   stages {
     stage('Build') {
+      when {not { expression { params.terraform_delete} }}
       steps {
         withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
           pwsh(script: './scripts/Build-Environment.ps1')
@@ -34,6 +40,15 @@ pipeline {
           pwsh(script: './scripts/Plan-Terraform.ps1')
           input 'Continue Terraform Apply?'
           pwsh(script: './scripts/Apply-Terraform.ps1')
+        }
+      }
+    }
+
+    stage('Destroy') {
+      when { expression { params.terraform_delete} }
+      steps {
+        withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
+          pwsh(script: './scripts/Destroy-Terraform.ps1')
         }
       }
     }
