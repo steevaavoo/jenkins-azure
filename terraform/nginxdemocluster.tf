@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "stvrg" {
   location = "${var.location}"
 }
 resource "azurerm_container_registry" "stvacr" {
-  name                = "${var.container_registry_name}1"
+  name                = "${var.container_registry_name}"
   resource_group_name = "${azurerm_resource_group.stvrg.name}"
   location            = "${azurerm_resource_group.stvrg.location}"
   admin_enabled       = "${var.acr_admin_enabled}"
