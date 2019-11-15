@@ -19,7 +19,9 @@ pipeline {
         withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
           pwsh(script: './scripts/Build-Environment.ps1')
           pwsh(script: './scripts/Prepare-Terraform.ps1')
-          pwsh(script: './scripts/Invoke-Terraform.ps1')
+          pwsh(script: './scripts/Plan-Terraform.ps1')
+          input 'Continue Terraform Apply?'
+          pwsh(script: './scripts/Apply-Terraform.ps1')
         }
       }
     }
