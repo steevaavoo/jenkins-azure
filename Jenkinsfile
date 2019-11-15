@@ -7,7 +7,6 @@ pipeline {
   agent any
 
   environment {
-    //STORAGE_KEY = 'willbefetchedbyscript'
     AKS_CLUSTER_NAME = 'stvaks1'
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'
@@ -33,8 +32,9 @@ pipeline {
   stages {
     stage('Init') {
       steps {
-        withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
+        withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
           pwsh(script: './scripts/Create-AzStorage.ps1')
+          pwsh(script: './scripts/Get-StorageKey.ps1')
           pwsh(script: './scripts/Replace-Tokens.ps1')
           pwsh(script: './scripts/Init-Terraform.ps1')
         }
@@ -44,7 +44,7 @@ pipeline {
     stage('Build') {
       when {not { expression { params.terraform_delete} }}
       steps {
-        withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
+        withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
           pwsh(script: './scripts/Plan-Terraform.ps1')
           input 'Continue Terraform Apply?'
           pwsh(script: './scripts/Apply-Terraform.ps1')
@@ -55,7 +55,7 @@ pipeline {
     stage('Destroy') {
       when { expression { params.terraform_delete} }
       steps {
-        withCredentials([string(credentialsId: 'storage_key', variable: 'STORAGE_KEY'), azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
+        withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
           pwsh(script: './scripts/Destroy-Terraform.ps1')
         }
       }
