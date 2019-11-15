@@ -16,7 +16,7 @@ variable "aks_dns_prefix" {
 }
 
 variable "azure_resourcegroup_name" {
-  default = "__TERRAFORM_STORAGE_RG__"
+  default = "__AKS_RG_NAME__"
 }
 
 variable "location" {
