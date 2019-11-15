@@ -1,11 +1,5 @@
-# Terraform tasks
-terraform version
-
 # Change into TF folder location
 Push-Location -Path .\terraform
-
-# Download required TF resources
-terraform init
 
 # Plan with differential output
 terraform plan -out=tfplan
