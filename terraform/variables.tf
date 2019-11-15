@@ -48,9 +48,9 @@ variable "agent_pool_profile_disk_size_gb" {
 }
 
 variable "service_principal_client_id" {
-  default = "__AZURE_CLIENT_ID__"
+  default = "__ARM_CLIENT_ID__"
 }
 
 variable "service_principal_client_secret" {
-  default = "__AZURE_CLIENT_SECRET__"
+  default = "__ARM_CLIENT_SECRET__"
 }
