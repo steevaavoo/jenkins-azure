@@ -13,6 +13,18 @@ pipeline {
     TERRAFORM_STORAGE_RG = 'terraform-rg'
   }
 
+  post {
+    always {
+      archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
+    }
+    success {
+    }
+    failure {
+    }
+    aborted {
+    }
+  }
+
   stages {
     stage('Build') {
       steps {

@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "stvrg" {
   location = "${var.location}"
 }
 resource "azurerm_container_registry" "stvacr" {
-  name                = "${var.container_registry_name}"
+  name                = "${var.container_registry_name}1"
   resource_group_name = "${azurerm_resource_group.stvrg.name}"
   location            = "${azurerm_resource_group.stvrg.location}"
   admin_enabled       = "${var.acr_admin_enabled}"
@@ -43,10 +43,10 @@ resource "azurerm_kubernetes_cluster" "stvaks" {
   }
 }
 
-output "client_certificate" {
-  value = "${azurerm_kubernetes_cluster.stvaks.kube_config.0.client_certificate}"
-}
+# output "client_certificate" {
+#   value = "${azurerm_kubernetes_cluster.stvaks.kube_config.0.client_certificate}"
+# }
 
-output "kube_config" {
-  value = "${azurerm_kubernetes_cluster.stvaks.kube_config_raw}"
-}
+# output "kube_config" {
+#   value = "${azurerm_kubernetes_cluster.stvaks.kube_config_raw}"
+# }
