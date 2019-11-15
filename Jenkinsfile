@@ -17,12 +17,12 @@ pipeline {
     always {
       archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
     }
-    success {
-    }
-    failure {
-    }
-    aborted {
-    }
+    // success {
+    // }
+    // failure {
+    // }
+    // aborted {
+    // }
   }
 
   stages {
