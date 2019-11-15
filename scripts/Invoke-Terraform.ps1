@@ -10,5 +10,8 @@ terraform init
 # Calculate planned changes
 terraform plan
 
+# Apply terraform
+terraform apply -auto-approve
+
 # Revert to previous folder location
 Pop-Location
