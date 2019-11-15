@@ -7,6 +7,7 @@ pipeline {
   agent any
 
   environment {
+    //STORAGE_KEY  = 'willbefetchedbyscript'
     AKS_CLUSTER_NAME = 'stvaks1'
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'

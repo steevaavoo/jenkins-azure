@@ -9,7 +9,7 @@ foreach ($envvar in (Get-ChildItem env:)) {
     $envVarHash.Add("$($tokenPrefix)$($envvar.Name)$($tokenSuffix)", $envvar.Value)
 }
 
-$envVarHash
+$envVarHash.GetEnumerator() | Sort-Object Name
 
 # Get files
 $targetFiles = (Get-ChildItem -Path $targetFilePattern)
