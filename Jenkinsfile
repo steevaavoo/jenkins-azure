@@ -54,6 +54,16 @@ pipeline {
       }
     }
 
+    stage('Docker') {
+      when {not { expression { params.terraform_delete} }}
+      steps {
+        withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')]) {
+          pwsh(script: './scripts/Build-DockerImage.ps1')
+          pwsh(script: './scripts/Push-DockerImage.ps1')
+        }
+      }
+    }
+
     stage('Destroy') {
       when { expression { params.terraform_delete} }
       steps {
