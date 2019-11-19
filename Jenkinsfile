@@ -16,6 +16,7 @@ pipeline {
     LOCATION = 'eastus'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
+    CONTAINER_REGISTRY_NAME = 'stvcontReg1'
   }
 
   post {
