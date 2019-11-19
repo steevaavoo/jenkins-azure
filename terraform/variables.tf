@@ -1,5 +1,5 @@
 variable "container_registry_name" {
-  default = "stvcontReg1"
+  default = "__CONTAINER_REGISTRY_NAME__"
 }
 
 variable "acr_admin_enabled" {
