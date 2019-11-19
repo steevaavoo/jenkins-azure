@@ -63,6 +63,8 @@ pipeline {
   post {
     always {
       archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
+      archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
+      junit allowEmptyResults: true, testResults: '**/*-junit.xml'
     }
     // success {
     // }
