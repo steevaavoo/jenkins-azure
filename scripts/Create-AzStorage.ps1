@@ -6,6 +6,10 @@
 # When using Windows agent in Azure DevOps, use batch scripting.
 # For batch files use the prefix "call" before every azure command.
 
+# Login to Az
+az login --service-principal --tenant $env:ARM_TENANT_ID -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET
+az account set --subscription $env:ARM_SUBSCRIPTION_ID
+
 # Resource Group
 Write-Output "STARTED: Creating Resource Group..."
 az group create --location $env:LOCATION --name $env:TERRAFORM_STORAGE_RG
