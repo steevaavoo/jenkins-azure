@@ -22,7 +22,7 @@ pipeline {
   options {
     withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')])
     ansiColor('xterm')
-    timestamps
+    timestamps()
   }
 
   stages {
