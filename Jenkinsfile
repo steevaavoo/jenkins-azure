@@ -4,7 +4,13 @@ pipeline {
     booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
   }
 
-  agent any
+  agent {
+      docker {
+          image 'steevaavoo/psjenkinsagent:latest'
+          //label 'my-defined-label'
+          //args  '-v /tmp:/tmp'
+      }
+  }
 
   environment {
     //STORAGE_KEY  = 'willbefetchedbyscript'
