@@ -1,2 +1,3 @@
-# Testing whether the double-hop Docker mount worked
+# Testing whether the Docker CLI / Docker socket mount worked
 docker info
+docker ps
