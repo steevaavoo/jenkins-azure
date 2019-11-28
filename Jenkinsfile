@@ -8,7 +8,7 @@ pipeline {
       docker {
           image 'steevaavoo/psjenkinsagent:latest'
           //label 'my-defined-label'
-          //args  '-v /tmp:/tmp'
+          args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
   }
 
@@ -34,6 +34,7 @@ pipeline {
   stages {
     stage('Init') {
       steps {
+        pwsh(script: './scripts/Test-Docker.ps1')
         pwsh(script: './scripts/Create-AzStorage.ps1')
         pwsh(script: './scripts/Get-StorageKey.ps1 ; ./scripts/Replace-Tokens.ps1')
         // pwsh(script: './scripts/Replace-Tokens.ps1')
