@@ -14,3 +14,4 @@
 - [ ] Add retry block to Destroy stage
 - [ ] Add Pester tests with junit output
 - [ ] Use cli to destroy storage (optional)
+- [ ] Add Helm for Kubernetes releases
