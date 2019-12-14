@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/powershell:6.2.3-centos-7
 
 # Versions
-ENV TERRAFORM_VERSION=0.12.16
+ENV TERRAFORM_VERSION=0.12.18
 ENV DOCKER_VERSION=19.03.5
 ENV KUBECTL_VERSION=v1.17.0
 
@@ -19,7 +19,8 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform
 # Install DockerCLI
 RUN docker_url=https://download.docker.com/linux/static/stable/x86_64 && \
     curl -fsSL $docker_url/docker-${DOCKER_VERSION}.tgz | \
-    tar zxvf - --strip 1 -C /usr/bin docker/docker
+    tar zxvf - --strip 1 -C /usr/bin docker/docker && \
+    rm -f docker-${DOCKER_VERSION}.tgz
 
 # Install Kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
