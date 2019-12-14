@@ -1,6 +1,6 @@
 pipeline {
 
-  triggers { pollSCM('* * * * *') } // Poll every minute
+  // triggers { pollSCM('* * * * *') } // Poll every minute
 
   parameters {
     booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
