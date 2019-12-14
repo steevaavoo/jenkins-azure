@@ -4,6 +4,7 @@ pipeline {
 
   parameters {
     booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
+    booleanParam name: 'storage_delete', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
   }
 
   agent {
@@ -71,12 +72,20 @@ pipeline {
       }
     }
 
-    stage('Destroy') {
+    stage('TerraformDestroy') {
       when { expression { params.terraform_delete} }
       steps {
         pwsh(script: './scripts/Destroy-Terraform.ps1')
       }
     }
+
+    stage('StorageDestroy') {
+      when { expression { params.storage_delete} }
+      steps {
+        pwsh(script: './scripts/Destroy-Storage.ps1')
+      }
+    }
+
   }
 
   post {
