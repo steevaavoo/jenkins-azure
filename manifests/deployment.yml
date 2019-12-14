@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginxdemo
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginxdemo
+    spec:
+      containers:
+        - name: nginxdemo
+          image: nginxdemos/hello
+          ports:
+          - containerPort: 80
