@@ -59,12 +59,12 @@ pipeline {
       }
     }
 
-    // stage('DeployK8s') {
-    //   when {not { expression { params.terraform_delete} }}
-    //   steps {
-
-    //   }
-    // }
+    stage('DeployK8s') {
+      when {not { expression { params.terraform_delete} }}
+      steps {
+        pwsh(script: './scripts/Test-K8s.ps1')
+      }
+    }
 
     stage('Destroy') {
       when { expression { params.terraform_delete} }
