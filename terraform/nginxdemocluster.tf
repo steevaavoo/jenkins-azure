@@ -34,7 +34,7 @@ resource "azurerm_kubernetes_cluster" "stvaks" {
 
   default_node_pool {
     name            = var.agent_pool_profile_name
-    count           = var.agent_pool_count
+    node_count      = var.agent_pool_count
     vm_size         = var.agent_pool_profile_vm_size
     os_disk_size_gb = var.agent_pool_profile_disk_size_gb
   }
