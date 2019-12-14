@@ -59,6 +59,13 @@ pipeline {
       }
     }
 
+    // stage('DeployK8s') {
+    //   when {not { expression { params.terraform_delete} }}
+    //   steps {
+
+    //   }
+    // }
+
     stage('Destroy') {
       when { expression { params.terraform_delete} }
       steps {
