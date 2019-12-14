@@ -1,5 +1,7 @@
 pipeline {
 
+  triggers { pollSCM('* * * * *') } // Poll every minute
+
   parameters {
     booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
   }
@@ -18,6 +20,9 @@ pipeline {
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'
     CONTAINER_REGISTRY_NAME = 'stvcontReg1'
+    CONTAINER_REGISTRY_REPOSITORY = 'samples/nodeapp'
+    ACR_REPOSITORY = "${CONTAINER_REGISTRY_NAME}.azurecr.io/${CONTAINER_REGISTRY_REPOSITORY}:${CONTAINER_IMAGE_TAG}"
+    CONTAINER_IMAGE_TAG = 'latest'
     DNS_DOMAIN_NAME = 'bakers-foundry.co.uk'
     DNS_IP_ADDRESS = 'AssignedBy_Wait-LoadbalancerIP.ps1'
     LOCATION = 'eastus'

@@ -1,16 +1,17 @@
 apiVersion : apps/v1beta1
 kind: Deployment
 metadata:
-  name: nginxdemo
+  name: nodeapp
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        app: nginxdemo
+        app: nodeapp
     spec:
       containers:
-        - name: nginxdemo
-          image: nginxdemos/hello
+        - name: nodeapp
+          # image: nginxdemos/hello
+          image: __ACR_REPOSITORY__
           ports:
           - containerPort: 80

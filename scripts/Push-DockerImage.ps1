@@ -4,12 +4,12 @@ Push-Location .\app
 az acr login --name $env:CONTAINER_REGISTRY_NAME
 
 # Getting the fqdn for the acr
-$acr_fqdn = (az acr list --query [0].loginServer -o tsv)
+$acr_fqdn = "$env:CONTAINER_REGISTRY_NAME.azurecr.io"
 
 # Tagging the app to the ACR
-docker tag steevaavoo/nodeapp $acr_fqdn/samples/nodeapp
+docker tag steevaavoo/nodeapp $acr_fqdn/$env:CONTAINER_REGISTRY_REPOSITORY
 
 # Pushing the image to the ACR
-docker push $acr_fqdn/samples/nodeapp
+docker push $acr_fqdn/$env:CONTAINER_REGISTRY_REPOSITORY
 
 Pop-Location

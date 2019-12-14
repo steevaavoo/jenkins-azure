@@ -1,7 +1,9 @@
 # Replace tokens
-$targetFilePattern = './terraform/*.tf'
-$tokenPrefix = '__'
-$tokenSuffix = '__'
+param (
+    $targetFilePattern = './terraform/*.tf',
+    $tokenPrefix = '__',
+    $tokenSuffix = '__'
+)
 
 # Prepare env vars
 $envVarHash = @{ }
