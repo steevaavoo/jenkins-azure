@@ -74,6 +74,7 @@ pipeline {
 
     stage('TerraformDestroy') {
       when { expression { params.terraform_delete} }
+      options { retry(3) }
       steps {
         pwsh(script: './scripts/Destroy-Terraform.ps1')
       }
@@ -81,6 +82,7 @@ pipeline {
 
     stage('StorageDestroy') {
       when { expression { params.storage_delete} }
+      options { retry(3) }
       steps {
         pwsh(script: './scripts/Destroy-Storage.ps1')
       }
