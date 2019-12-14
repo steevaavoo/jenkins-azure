@@ -1,3 +1,9 @@
+# Configure Providers
+provider "azurerm" {
+  # Pin version as per best practice
+  version = "=1.38.0"
+}
+
 # Deploying Terraform Remote State to AZ Storage Container
 terraform {
   required_version = ">= 0.12"
@@ -26,13 +32,20 @@ resource "azurerm_kubernetes_cluster" "stvaks" {
   resource_group_name = azurerm_resource_group.stvrg.name
   dns_prefix          = var.aks_dns_prefix
 
-  agent_pool_profile {
+  default_node_pool {
     name            = var.agent_pool_profile_name
     count           = var.agent_pool_count
     vm_size         = var.agent_pool_profile_vm_size
-    os_type         = var.agent_pool_profile_os_type
     os_disk_size_gb = var.agent_pool_profile_disk_size_gb
   }
+
+  # agent_pool_profile {
+  #   name            = var.agent_pool_profile_name
+  #   count           = var.agent_pool_count
+  #   vm_size         = var.agent_pool_profile_vm_size
+  #   os_type         = var.agent_pool_profile_os_type
+  # }
+
   service_principal {
     client_id     = var.service_principal_client_id
     client_secret = var.service_principal_client_secret
