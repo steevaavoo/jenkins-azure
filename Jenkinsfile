@@ -67,7 +67,7 @@ pipeline {
     stage('DeployK8s') {
       when {not { expression { params.terraform_delete} }}
       steps {
-        pwsh(script: './scripts/Test-K8s.ps1')
+        pwsh(script: './scripts/Deploy-Manifests.ps1')
       }
     }
 
