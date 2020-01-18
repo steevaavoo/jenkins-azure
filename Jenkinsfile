@@ -58,7 +58,7 @@ pipeline {
           sh '''
             nochange=$(cat ./terraform/diff.txt | grep "Plan: 0 to add, 0 to change, 0 to destroy.")
           '''
-          if (! nochange) {
+          if (! $nochange) {
             input 'Continue Terraform Apply?'
           }
         }
