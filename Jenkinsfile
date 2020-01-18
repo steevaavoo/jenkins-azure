@@ -8,7 +8,7 @@ pipeline {
   }
 
   // Variable for Container Ingress IP
-  def ingress_ip = 'ToBeUpdated'
+  // def ingress_ip = 'ToBeUpdated'
 
   agent {
       docker {
