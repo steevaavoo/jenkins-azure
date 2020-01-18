@@ -28,7 +28,6 @@ pipeline {
     ACR_REPOSITORY = "${CONTAINER_REGISTRY_NAME}.azurecr.io/${CONTAINER_REGISTRY_REPOSITORY}:${CONTAINER_IMAGE_TAG}"
     CONTAINER_IMAGE_TAG = 'latest'
     DNS_DOMAIN_NAME = 'bakers-foundry.co.uk'
-    DNS_IP_ADDRESS = 'AssignedBy_Wait-LoadbalancerIP.ps1'
     LOCATION = 'eastus'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
@@ -36,6 +35,8 @@ pipeline {
 
   options {
     withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')])
+    withCredentials([string(credentialsId: 'API_KEY', variable: 'API_KEY')])
+    withCredentials([string(credentialsId: 'API_SECRET', variable: 'API_SECRET')])
     ansiColor('xterm')
     timestamps()
   }
@@ -72,6 +73,7 @@ pipeline {
       when {not { expression { params.terraform_delete} }}
       steps {
         pwsh(script: './scripts/Deploy-Manifests.ps1')
+        pwsh(script: './scripts/Update-Dns.ps1' -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET})
       }
     }
 

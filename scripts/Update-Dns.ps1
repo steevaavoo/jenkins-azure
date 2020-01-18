@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    Updates a DNS A record with a new IP address
+    Waits for a Load Balancer Ingress IP then uses it to update a DNS A record
 .DESCRIPTION
-    Updates a DNS A record with a new IP address using the GoDaddy PowerShell module
+    Waits for a Load Balancer Ingress IP then uses it to update a DNS A record
 .LINK
     https://www.powershellgallery.com/packages/Trackyon.GoDaddy
 .NOTES
@@ -14,12 +14,49 @@
 
 [CmdletBinding()]
 param (
+    $AksResourceGroupName,
+    $AksClusterName,
+    $UseAksAdmin,
+    $TimeoutSeconds = 1800, # 1800s = 30 mins
+    $RetryIntervalSeconds = 10,
     $DomainName,
-    $IPAddress,
     $ApiKey,
     $ApiSecret,
     $Ttl = 600
 )
+
+# Merge AKS cluster details into ~\.kube\config
+$importAzAksCredentialSplat = @{
+    ResourceGroupName = $AksResourceGroupName
+    Name              = $AksClusterName
+    Force             = $true
+    Verbose           = $true
+}
+if ($UseAksAdmin.IsPresent) {
+    $importAzAksCredentialSplat.Admin = $true
+}
+Import-AzAksCredential @importAzAksCredentialSplat
+
+# Wait for Loadbalancer IP to exist
+$timer = [Diagnostics.Stopwatch]::StartNew()
+
+while (-not ($IPAddress = kubectl get svc nginxdemo --ignore-not-found -o jsonpath="{.status.loadBalancer.ingress[0].ip}")) {
+
+    if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
+        Write-Verbose "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
+        exit 1
+    } else {
+        Write-Verbose "Current Loadbalancer IP value: [$IPAddress]"
+        Write-Verbose "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
+        Start-Sleep -Seconds $RetryIntervalSeconds
+    }
+}
+
+$timer.Stop()
+
+# Update pipeline variable
+Write-Verbose "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
+Write-Output $IPAddress
 
 # Init
 Install-Module -Name "Trackyon.GoDaddy"-Scope "CurrentUser" -Force
