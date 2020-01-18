@@ -32,6 +32,7 @@ pipeline {
     LOCATION = 'eastus'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
+    ARBITRARY = 'null'
   }
 
   options {
@@ -72,7 +73,9 @@ pipeline {
       when {not { expression { params.terraform_delete} }}
       steps {
         pwsh(script: './scripts/Deploy-Manifests.ps1')
-        ingress_ip = pwsh(script: './scripts/Wait-LoadbalancerIP.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME}', returnStdout: true).trim()
+        pwsh(script: './scripts/Change-Arbitrary.ps1')
+        pwsh(script: './scripts/Output-Arbitrary.ps1', returnStdout: true)
+        // ingress_ip = pwsh(script: './scripts/Wait-LoadbalancerIP.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME}', returnStdout: true).trim()
       }
     }
 
