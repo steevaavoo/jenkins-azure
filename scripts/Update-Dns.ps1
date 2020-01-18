@@ -25,17 +25,8 @@ param (
     $Ttl = 600
 )
 
-# Merge AKS cluster details into ~\.kube\config
-$importAzAksCredentialSplat = @{
-    ResourceGroupName = $AksResourceGroupName
-    Name              = $AksClusterName
-    Force             = $true
-    Verbose           = $true
-}
-if ($UseAksAdmin.IsPresent) {
-    $importAzAksCredentialSplat.Admin = $true
-}
-Import-AzAksCredential @importAzAksCredentialSplat
+# Setting k8s current context
+az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
 
 # Wait for Loadbalancer IP to exist
 $timer = [Diagnostics.Stopwatch]::StartNew()
