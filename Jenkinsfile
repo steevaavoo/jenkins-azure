@@ -54,7 +54,14 @@ pipeline {
       when {not { expression { params.terraform_delete} }}
       steps {
         pwsh(script: './scripts/Plan-Terraform.ps1')
-        input 'Continue Terraform Apply?'
+        script {
+          sh '''
+            nochange=$(cat ./terraform/diff.txt | grep "Plan: 0 to add, 0 to change, 0 to destroy.")
+          '''
+          if (! nochange) {
+            input 'Continue Terraform Apply?'
+          }
+        }
         pwsh(script: './scripts/Apply-Terraform.ps1')
       }
     }
