@@ -13,7 +13,7 @@
 - [x] Deploy custom container in K8s
 - [x] Use cli to destroy storage (optional)
 - [x] Add retry block to Destroy stage
-- [ ] Update DNS record with App IP
+- [x] Update DNS record with App IP
 - [ ] Add Pester tests with junit output
 - [ ] Add Helm for Kubernetes releases
 - [ ] Only Prompt to continue if TF changes exist
