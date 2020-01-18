@@ -1,1 +1,1 @@
-$env:ARBITRARY = 'Hello Steve!'
+Write-Host 'Hello Steve!'
