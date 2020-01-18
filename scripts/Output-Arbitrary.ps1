@@ -1,1 +1,1 @@
-Write-Output "$env:ARBITRARY"
+Write-Host "$env:ARBITRARY"
