@@ -22,7 +22,8 @@ param (
     $DomainName,
     $ApiKey,
     $ApiSecret,
-    $Ttl = 600
+    $Ttl = 600,
+    $ServiceName = 'nodeapp'
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,7 +34,7 @@ az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER
 # Wait for Loadbalancer IP to exist
 $timer = [Diagnostics.Stopwatch]::StartNew()
 
-while (-not ($IPAddress = kubectl get svc nginxdemo --ignore-not-found -o jsonpath="{.status.loadBalancer.ingress[0].ip}")) {
+while (-not ($IPAddress = kubectl get svc $ServiceName --ignore-not-found -o jsonpath="{.status.loadBalancer.ingress[0].ip}")) {
 
     if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
         Write-Host "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"

@@ -16,3 +16,4 @@
 - [ ] Update DNS record with App IP
 - [ ] Add Pester tests with junit output
 - [ ] Add Helm for Kubernetes releases
+- [ ] Only Prompt to continue if TF changes exist
