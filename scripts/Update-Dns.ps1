@@ -36,11 +36,11 @@ $timer = [Diagnostics.Stopwatch]::StartNew()
 while (-not ($IPAddress = kubectl get svc nginxdemo --ignore-not-found -o jsonpath="{.status.loadBalancer.ingress[0].ip}")) {
 
     if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
-        Write-Verbose "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
+        Write-Host "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
         exit 1
     } else {
-        Write-Verbose "Current Loadbalancer IP value: [$IPAddress]"
-        Write-Verbose "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
+        Write-Host "Current Loadbalancer IP value: [$IPAddress]"
+        Write-Host "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
         Start-Sleep -Seconds $RetryIntervalSeconds
     }
 }
@@ -48,8 +48,8 @@ while (-not ($IPAddress = kubectl get svc nginxdemo --ignore-not-found -o jsonpa
 $timer.Stop()
 
 # Update pipeline variable
-Write-Verbose "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
-Write-Output $IPAddress
+Write-Host "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
+Write-Host "Found IP [$IPAddress]"
 
 # Init
 Install-Module -Name "Trackyon.GoDaddy"-Scope "CurrentUser" -Force
@@ -63,9 +63,9 @@ Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String 
 
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
-Write-Output "STARTED: $message"
+Write-Host "STARTED: $message"
 Set-GDDomainRecord -credentials $apiCredential -domain $DomainName -name '@' -ipaddress $IPAddress -type "A" -ttl $Ttl -Force
-Write-Output "FINISHED: $message"
+Write-Host "FINISHED: $message"
 
 # Output updated records
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
