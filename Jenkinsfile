@@ -1,22 +1,102 @@
 pipeline {
-
-  // triggers { pollSCM('* * * * *') } // Poll every minute
-
-  parameters {
-    booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
-    booleanParam name: 'storage_delete', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
-  }
-
   agent {
-      docker {
-          image 'steevaavoo/psjenkinsagent:latest'
-          //label 'my-defined-label'
-          args  '-v /var/run/docker.sock:/var/run/docker.sock'
-      }
-  }
+    docker {
+      image 'steevaavoo/psjenkinsagent:latest'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+    }
 
+  }
+  stages {
+    stage('Init') {
+      steps {
+        pwsh './scripts/Test-Docker.ps1'
+        pwsh './scripts/Create-AzStorage.ps1'
+        pwsh './scripts/Get-StorageKey.ps1 ; ./scripts/Replace-Tokens.ps1'
+        pwsh './scripts/Init-Terraform.ps1'
+      }
+    }
+
+    stage('Build') {
+      when {
+        not {
+          expression {
+            params.terraform_delete
+          }
+
+        }
+
+      }
+      steps {
+        pwsh './scripts/Plan-Terraform.ps1'
+        input 'Continue Terraform Apply?'
+        pwsh './scripts/Apply-Terraform.ps1'
+      }
+    }
+
+    stage('Docker') {
+      when {
+        not {
+          expression {
+            params.terraform_delete
+          }
+
+        }
+
+      }
+      steps {
+        pwsh './scripts/Build-DockerImage.ps1'
+        pwsh './scripts/Push-DockerImage.ps1'
+      }
+    }
+
+    stage('DeployK8s') {
+      when {
+        not {
+          expression {
+            params.terraform_delete
+          }
+
+        }
+
+      }
+      steps {
+        pwsh './scripts/Deploy-Manifests.ps1'
+        pwsh(script: 'placeholder', returnStdout: true)
+      }
+    }
+
+    stage('TerraformDestroy') {
+      when {
+        expression {
+          params.terraform_delete
+        }
+
+      }
+      options {
+        retry(3)
+      }
+      steps {
+        pwsh './scripts/Destroy-Terraform.ps1'
+      }
+    }
+
+    stage('StorageDestroy') {
+      when {
+        expression {
+          params.storage_delete
+        }
+
+      }
+      options {
+        retry(3)
+      }
+      steps {
+        pwsh './scripts/Destroy-Storage.ps1'
+      }
+    }
+
+  }
   environment {
-    //STORAGE_KEY  = 'willbefetchedbyscript'
     AKS_CLUSTER_NAME = 'stvaks1'
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'
@@ -30,78 +110,21 @@ pipeline {
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
   }
+  post {
+    always {
+      archiveArtifacts(allowEmptyArchive: true, artifacts: '**/diff.txt')
+      archiveArtifacts(allowEmptyArchive: true, artifacts: '**/*-junit.xml')
+      junit(allowEmptyResults: true, testResults: '**/*-junit.xml')
+    }
 
+  }
   options {
     withCredentials([azureServicePrincipal(clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', credentialsId: 'azure-jenkins', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID')])
     ansiColor('xterm')
     timestamps()
   }
-
-  stages {
-    stage('Init') {
-      steps {
-        pwsh(script: './scripts/Test-Docker.ps1')
-        pwsh(script: './scripts/Create-AzStorage.ps1')
-        pwsh(script: './scripts/Get-StorageKey.ps1 ; ./scripts/Replace-Tokens.ps1')
-        // pwsh(script: './scripts/Replace-Tokens.ps1')
-        pwsh(script: './scripts/Init-Terraform.ps1')
-      }
-    }
-
-    stage('Build') {
-      when {not { expression { params.terraform_delete} }}
-      steps {
-        pwsh(script: './scripts/Plan-Terraform.ps1')
-        input 'Continue Terraform Apply?'
-        pwsh(script: './scripts/Apply-Terraform.ps1')
-      }
-    }
-
-    stage('Docker') {
-      when {not { expression { params.terraform_delete} }}
-      steps {
-        pwsh(script: './scripts/Build-DockerImage.ps1')
-        pwsh(script: './scripts/Push-DockerImage.ps1')
-      }
-    }
-
-    stage('DeployK8s') {
-      when {not { expression { params.terraform_delete} }}
-      steps {
-        pwsh(script: './scripts/Deploy-Manifests.ps1')
-      }
-    }
-
-    stage('TerraformDestroy') {
-      when { expression { params.terraform_delete} }
-      options { retry(3) }
-      steps {
-        pwsh(script: './scripts/Destroy-Terraform.ps1')
-      }
-    }
-
-    stage('StorageDestroy') {
-      when { expression { params.storage_delete} }
-      options { retry(3) }
-      steps {
-        pwsh(script: './scripts/Destroy-Storage.ps1')
-      }
-    }
-
+  parameters {
+    booleanParam(name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).')
+    booleanParam(name: 'storage_delete', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).')
   }
-
-  post {
-    always {
-      archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
-      archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
-      junit allowEmptyResults: true, testResults: '**/*-junit.xml'
-    }
-    // success {
-    // }
-    // failure {
-    // }
-    // aborted {
-    // }
-  }
-
 }
