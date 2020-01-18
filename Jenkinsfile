@@ -73,8 +73,10 @@ pipeline {
       when {not { expression { params.terraform_delete} }}
       steps {
         pwsh(script: './scripts/Deploy-Manifests.ps1')
-        env.ARBITRARY = pwsh(script: './scripts/Change-Arbitrary.ps1', returnStdout: true).trim()
-        pwsh(script: './scripts/Output-Arbitrary.ps1', returnStdout: true)
+        script{
+          ARBITRARY = pwsh(script: './scripts/Change-Arbitrary.ps1', returnStdout: true).trim()
+          pwsh(script: './scripts/Output-Arbitrary.ps1', returnStdout: true)
+        }
         // ingress_ip = pwsh(script: './scripts/Wait-LoadbalancerIP.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME}', returnStdout: true).trim()
       }
     }
