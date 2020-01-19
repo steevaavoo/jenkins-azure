@@ -43,8 +43,8 @@ pipeline {
 
           echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
           script {
-            if (${TF_CHANGES_EXIST} ) {
-              input 'Continue Terraform Apply?'
+            if (env.TF_CHANGES_EXIST == "True") {
+              input 'Changes found in TF plan. Continue Terraform Apply?'
             }
           }
 
