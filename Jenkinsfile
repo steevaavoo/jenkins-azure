@@ -34,7 +34,11 @@ pipeline {
   }
 
   options {
-    withCredentials([azureServicePrincipal(credentialsId: 'azure-jenkins', clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID'), string(credentialsId: 'API_KEY', variable: 'API_KEY'), string(credentialsId: 'API_SECRET', variable: 'API_SECRET')])
+    withCredentials([
+      azureServicePrincipal(credentialsId: 'azure-jenkins', clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID'),
+      string(credentialsId: 'API_KEY', variable: 'API_KEY'),
+      string(credentialsId: 'API_SECRET', variable: 'API_SECRET')
+    ])
     ansiColor('xterm')
     timestamps()
   }
