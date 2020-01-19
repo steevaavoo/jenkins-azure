@@ -41,11 +41,12 @@ pipeline {
           // but the variable TUBE_STATUS will not.
           sh 'printenv | sort'
 
-          echo ""
-          if (${TF_CHANGES_EXIST} ) {
-            input 'Continue Terraform Apply?'
+          echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
+          script {
+            if (${TF_CHANGES_EXIST} ) {
+              input 'Continue Terraform Apply?'
+            }
           }
-
 
           // This will print 'The tube is currently '
           // because single-quotes causes the expression to be evaluated
