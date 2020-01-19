@@ -12,7 +12,7 @@ pipeline {
 
   agent {
       docker {
-          image 'steevaavoo/psjenkinsagent:latest'
+          image 'adamrushuk/psjenkinsagent:latest'
           //label 'my-defined-label'
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
