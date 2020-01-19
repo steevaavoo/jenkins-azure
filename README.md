@@ -19,6 +19,7 @@
 - [x] Add prereq steps, eg: Azure Service Principal (see below)
 - [ ] Update Jenkins Agent dockerfile with latest util versions, and push to Docker Hub
 - [ ] Update Terraform to use latest version of Azure provider
+- [ ] Add improved output to all scripts, esp. az cli scripts with no current output (`Destroy-Storage.ps1`)
 - [ ] Create a multi-stage Docker image build, to reduce image size (docker push takes too long)
 - [ ] Add Pester tests with junit output
 - [ ] Add Helm for Kubernetes releases
