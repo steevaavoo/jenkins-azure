@@ -14,6 +14,21 @@
 - [x] Use cli to destroy storage (optional)
 - [x] Add retry block to Destroy stage
 - [x] Update DNS record with App IP
+- [x] Add example of using an external script with `returnStdout` method
+- [x] Only prompt to continue if TF changes exist
+- [x] Add prereq steps, eg: Azure Service Principal (see below)
 - [ ] Add Pester tests with junit output
 - [ ] Add Helm for Kubernetes releases
-- [ ] Only Prompt to continue if TF changes exist
+- [ ] Complete this README with proper usage instructions
+
+```powershell
+# Login to your target Azure environment
+az login
+
+# Create a Service Principle named "jenkins"
+# outputting the required info for future use
+az ad sp create-for-rbac --name jenkins --query "{ client_id: appId, client_secret: password, tenant_id: tenant }"
+
+# output subscription id
+az account show --query "{ subscription_id: id }"
+```
