@@ -1,3 +1,4 @@
+// https://raw.githubusercontent.com/monodot/jenkins-demos/master/environment-variables/Jenkinsfile.with-agents
 pipeline {
 
   agent {
@@ -27,6 +28,8 @@ pipeline {
             env.ENV_BRANCH = 'demo-branch'
 
             DEMO_BRANCH = 'demo2-branch'
+
+            env.TF_CHANGES_EXIST = pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
         }
       }
     }
@@ -37,6 +40,12 @@ pipeline {
           // The env var YESTERDAYS_WEATHER will appear in this list,
           // but the variable TUBE_STATUS will not.
           sh 'printenv | sort'
+
+          echo ""
+          if (${TF_CHANGES_EXIST} ) {
+            input 'Continue Terraform Apply?'
+          }
+
 
           // This will print 'The tube is currently '
           // because single-quotes causes the expression to be evaluated
