@@ -1,7 +1,7 @@
 # Configure Providers
 provider "azurerm" {
   # Pin version as per best practice
-  version = "=1.38.0"
+  version = "=1.41.0"
 }
 
 # Deploying Terraform Remote State to AZ Storage Container
