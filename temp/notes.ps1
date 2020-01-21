@@ -1,14 +1,14 @@
 #region Jenkins blueocean
 # Open http://localhost:8080
 docker run `
---rm -d `
--u root `
--p 8080:8080 `
--v jenkins-data:/var/jenkins_home `
--v /var/run/docker.sock:/var/run/docker.sock `
--v ${HOME}:/home `
---name jenkins `
-jenkinsci/blueocean
+    --rm -d `
+    -u root `
+    -p 8080:8080 `
+    -v jenkins-data:/var/jenkins_home `
+    -v /var/run/docker.sock:/var/run/docker.sock `
+    -v ${HOME}:/home `
+    --name jenkins `
+    jenkinsci/blueocean
 
 # Show logs to see admin unlock code
 docker container logs jenkins
@@ -43,10 +43,15 @@ docker container start jenkins
 #region Jenkins Agent
 # Build
 Push-Location .\agent
+docker build . -t adamrushuk/psjenkinsagent:2020-01-21
 docker build . -t adamrushuk/psjenkinsagent:latest
 
 # Show
 docker image ls adamrushuk/psjenkinsagent
+
+# Push
+docker push adamrushuk/psjenkinsagent:2020-01-21
+docker push adamrushuk/psjenkinsagent:latest
 
 # Run
 docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest bash
