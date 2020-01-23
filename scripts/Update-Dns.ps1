@@ -29,7 +29,10 @@ param (
 $ErrorActionPreference = "Stop"
 
 # Setting k8s current context
+$message = "Getting AKS credentials"
+Write-Output "STARTED: $message..."
 az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
+Write-Output "FINISHED: $message."
 
 # Wait for Loadbalancer IP to exist
 $timer = [Diagnostics.Stopwatch]::StartNew()
@@ -53,14 +56,24 @@ Write-Host "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.
 Write-Host "Found IP [$IPAddress]"
 
 # Init
+$message = "Installing GoDaddy PowerShell module"
+Write-Output "STARTED: $message..."
 Install-Module -Name "Trackyon.GoDaddy"-Scope "CurrentUser" -Force
+Write-Output "FINISHED: $message."
+
 $apiCredential = [pscredential]::new($ApiKey, (ConvertTo-SecureString -String $ApiSecret -AsPlainText -Force))
+
+
+$message = "Getting current domain information"
+Write-Output "STARTED: $message..."
 
 # Output Domain
 Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
 
 # Output current records
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
+Write-Output "FINISHED: $message."
+
 
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
