@@ -3,7 +3,7 @@
 
 # Setting k8s current context
 $message = "Merging AKS credentials"
-Write-Output "STARTED: $message..."
+Write-Output "`nSTARTED: $message..."
 az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
 Write-Output "FINISHED: $message."
 
@@ -12,7 +12,7 @@ kubectl version --short
 
 # Apply manifests
 $message = "Applying Kubernetes manifests"
-Write-Output "STARTED: $message..."
+Write-Output "`nSTARTED: $message..."
 kubectl apply -f ./manifests
 Write-Output "FINISHED: $message."
 

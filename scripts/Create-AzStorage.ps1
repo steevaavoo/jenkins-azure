@@ -11,22 +11,22 @@ az login --service-principal --tenant $env:ARM_TENANT_ID -u $env:ARM_CLIENT_ID -
 az account set --subscription $env:ARM_SUBSCRIPTION_ID
 
 # Resource Group
-Write-Output "STARTED: Creating Resource Group..."
+Write-Output "`nSTARTED: Creating Resource Group..."
 az group create --location $env:LOCATION --name $env:TERRAFORM_STORAGE_RG
 Write-Output "FINISHED: Creating Resource Group."
 
 # Storage Account
-Write-Output "STARTED: Creating Storage Account..."
+Write-Output "`nSTARTED: Creating Storage Account..."
 az storage account create --name $env:TERRAFORM_STORAGE_ACCOUNT --resource-group $env:TERRAFORM_STORAGE_RG --location $env:LOCATION --sku Standard_LRS
 Write-Output "FINISHED: Creating Storage Account."
 
 # Storage Container
-Write-Output "STARTED: Creating Storage Container..."
+Write-Output "`nSTARTED: Creating Storage Container..."
 az storage container create --name "terraform" --account-name $env:TERRAFORM_STORAGE_ACCOUNT
 Write-Output "FINISHED: Creating Storage Container."
 
 # Get latest supported AKS version and update Azure DevOps Pipeline variable
-Write-Output "STARTED: Finding latest supported AKS version..."
+Write-Output "`nSTARTED: Finding latest supported AKS version..."
 $latest_aks_version = $(az aks get-versions -l $env:LOCATION --query "orchestrators[-1].orchestratorVersion" -o tsv)
 Write-Output "Updating Pipeline variable with Latest AKS Version:"
 Write-Output $latest_aks_version

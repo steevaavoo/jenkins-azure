@@ -30,7 +30,7 @@ $ErrorActionPreference = "Stop"
 
 # Setting k8s current context
 $message = "Getting AKS credentials"
-Write-Output "STARTED: $message..."
+Write-Output "`nSTARTED: $message..."
 az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
 Write-Output "FINISHED: $message."
 
@@ -57,7 +57,7 @@ Write-Host "Found IP [$IPAddress]"
 
 # Init
 $message = "Installing GoDaddy PowerShell module"
-Write-Output "STARTED: $message..."
+Write-Output "`nSTARTED: $message..."
 Install-Module -Name "Trackyon.GoDaddy"-Scope "CurrentUser" -Force
 Write-Output "FINISHED: $message."
 
@@ -65,7 +65,7 @@ $apiCredential = [pscredential]::new($ApiKey, (ConvertTo-SecureString -String $A
 
 
 $message = "Getting current domain information"
-Write-Output "STARTED: $message..."
+Write-Output "`nSTARTED: $message..."
 
 # Output Domain
 Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Write-Output

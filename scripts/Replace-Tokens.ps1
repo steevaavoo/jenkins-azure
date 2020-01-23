@@ -6,7 +6,7 @@ param (
 )
 
 $message = "Replacing tokens in Environment variables"
-Write-Output "STARTED: $message..."
+Write-Output "`nSTARTED: $message..."
 
 # Prepare env vars
 $envVarHash = @{ }
