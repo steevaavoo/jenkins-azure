@@ -64,7 +64,10 @@ pipeline {
         pwsh(script: './scripts/Plan-Terraform.ps1')
         script {
           // Example of a PowerShell script returning a boolean ($true or $false) to an Jenkins env var
+          echo "running Test-TFChangesExist.ps1"
           env.TF_CHANGES_EXIST = pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
+          echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
+
 
           // Evaluate the env var within Jenkins process, or within an external script
           // Jenkins: env.TF_CHANGES_EXIST
