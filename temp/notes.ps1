@@ -10,6 +10,12 @@ docker run `
     --name jenkins `
     jenkinsci/blueocean
 
+# Jenkins Plugins to install
+AnsiColor
+Azure Credentials
+PowerShell
+timestamper
+
 # Show logs to see admin unlock code
 docker container logs jenkins
 
