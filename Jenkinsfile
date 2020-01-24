@@ -76,6 +76,8 @@ pipeline {
           if (env.TF_CHANGES_EXIST == "True") {
             input 'Changes found in TF plan. Continue Terraform Apply?'
             pwsh(script: './scripts/Apply-Terraform.ps1')
+          } else {
+            echo "SKIPPING: Terraform apply - no changes"
           }
         }
       }
