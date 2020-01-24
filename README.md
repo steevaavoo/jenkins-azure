@@ -17,10 +17,10 @@
 - [x] Add example of using an external script with `returnStdout` method
 - [x] Only prompt to continue if TF changes exist
 - [x] Add prereq steps, eg: Azure Service Principal (see below)
-- [ ] Update Jenkins Agent dockerfile with latest util versions, and push to Docker Hub
-- [ ] Update Terraform to use latest version of Azure provider
-- [ ] Add improved output to all scripts, esp. az cli scripts with no current output (`Destroy-Storage.ps1`)
-- [ ] Create a multi-stage Docker image build, to reduce image size (docker push takes too long)
+- [x] Create a multi-stage Docker image build, to reduce image size (docker push takes too long)
+- [x] Update Terraform to use latest version of Azure provider
+- [x] Update Jenkins Agent dockerfile with latest util versions, and push to Docker Hub
+- [x] Add improved output to all scripts, esp. az cli scripts with no current output (`Destroy-Storage.ps1`)
 - [ ] Add Pester tests with junit output
 - [ ] Add Helm for Kubernetes releases
 - [ ] Complete this README with proper usage instructions

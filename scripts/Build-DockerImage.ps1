@@ -1,6 +1,9 @@
 Push-Location .\app
 
 # Building Docker image on Agent
-docker build . -t steevaavoo/nodeapp:latest
+$message = "Building docker image"
+Write-Output "`nSTARTED: $message..."
+docker build . -t adamrushuk/nodeapp:latest
+Write-Output "FINISHED: $message."
 
 Pop-Location

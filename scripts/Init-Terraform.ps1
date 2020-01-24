@@ -5,7 +5,10 @@ terraform version
 Push-Location -Path .\terraform
 
 # Download required TF resources
+$message = "Initialising Terraform environment"
+Write-Output "`nSTARTED: $message..."
 terraform init
+Write-Output "FINISHED: $message."
 
 # Revert to previous folder location
 Pop-Location

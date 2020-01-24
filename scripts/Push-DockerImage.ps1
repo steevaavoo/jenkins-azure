@@ -7,7 +7,7 @@ az acr login --name $env:CONTAINER_REGISTRY_NAME
 $acr_fqdn = "$env:CONTAINER_REGISTRY_NAME.azurecr.io"
 
 # Tagging the app to the ACR
-docker tag steevaavoo/nodeapp $acr_fqdn/$env:CONTAINER_REGISTRY_REPOSITORY
+docker tag adamrushuk/nodeapp $acr_fqdn/$env:CONTAINER_REGISTRY_REPOSITORY
 
 # Pushing the image to the ACR
 docker push $acr_fqdn/$env:CONTAINER_REGISTRY_REPOSITORY

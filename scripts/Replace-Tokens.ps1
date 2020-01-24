@@ -5,6 +5,9 @@ param (
     $tokenSuffix = '__'
 )
 
+$message = "Replacing tokens in Environment variables"
+Write-Output "`nSTARTED: $message..."
+
 # Prepare env vars
 $envVarHash = @{ }
 foreach ($envvar in (Get-ChildItem env:)) {
@@ -22,3 +25,5 @@ foreach ($targetFile in $targetFiles) {
         ((Get-Content -Path $targetFile -Raw) -replace $item.key, $item.value) | Set-Content -Path $targetFile
     }
 }
+
+Write-Output "FINISHED: $message."

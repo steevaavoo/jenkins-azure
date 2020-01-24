@@ -1,11 +1,11 @@
-FROM node:8
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
+# Build stage
+FROM node:8 as build
+WORKDIR /app
+COPY package*.json server.js ./
 RUN npm ci --only=production
 
-COPY . .
-
+# Final stage
+FROM gcr.io/distroless/nodejs
+COPY --from=build /app /
 EXPOSE 8080
-CMD [ "npm", "start" ]
+CMD ["server.js"]
