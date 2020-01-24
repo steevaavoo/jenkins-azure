@@ -1,3 +1,8 @@
+# Test script that should ONLY returns true or false
+#
+# IMPORTANT: when using "returnStdout: true" in Jenkins, you MUST ensure ONLY your desired value is output to the
+# pipeline. DO NOT use Write-Output, Write-Host etc.
+
 # Change into TF folder location
 Push-Location -Path .\terraform
 
