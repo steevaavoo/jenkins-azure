@@ -3,8 +3,9 @@ pipeline {
   // triggers { pollSCM('* * * * *') } // Poll every minute
 
   parameters {
-    booleanParam name: 'terraform_delete', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
-    booleanParam name: 'storage_delete', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
+    booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
+    booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
+    booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
   }
 
   agent {
@@ -45,6 +46,7 @@ pipeline {
   stages {
     stage('Init') {
       steps {
+        pwsh(script: './scripts/Login-Azure.ps1')
         pwsh(script: './scripts/Test-Docker.ps1')
         pwsh(script: './scripts/Create-AzStorage.ps1')
         // To share env vars between external scripts, you can call multiple scripts in a single line
@@ -54,7 +56,7 @@ pipeline {
     }
 
     stage('Build') {
-      when {not { expression { params.terraform_delete} }}
+      when {not { expression { params.TERRAFORM_DELETE} }}
       options {
         timeout(time: 1, unit: 'HOURS')
       }
@@ -84,14 +86,14 @@ pipeline {
     }
 
     stage('Docker') {
-      when {not { expression { params.terraform_delete} }}
+      when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: './scripts/Build-DockerImage.ps1')
       }
     }
 
     stage('DeployK8s') {
-      when {not { expression { params.terraform_delete} }}
+      when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: './scripts/Deploy-Manifests.ps1')
         pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
@@ -99,7 +101,7 @@ pipeline {
     }
 
     stage('TerraformDestroy') {
-      when { expression { params.terraform_delete} }
+      when { expression { params.TERRAFORM_DELETE} }
       options { retry(3) }
       steps {
         pwsh(script: './scripts/Destroy-Terraform.ps1')
@@ -107,7 +109,7 @@ pipeline {
     }
 
     stage('StorageDestroy') {
-      when { expression { params.storage_delete} }
+      when { expression { params.STORAGE_DELETE} }
       options { retry(3) }
       steps {
         pwsh(script: './scripts/Destroy-Storage.ps1')
