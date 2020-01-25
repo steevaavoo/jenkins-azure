@@ -87,7 +87,7 @@ pipeline {
       when {not { expression { params.terraform_delete} }}
       steps {
         pwsh(script: './scripts/Build-DockerImage.ps1')
-        pwsh(script: './scripts/Push-DockerImage.ps1')
+        // pwsh(script: './scripts/Push-DockerImage.ps1')
       }
     }
 
