@@ -11,10 +11,11 @@ docker run `
     jenkinsci/blueocean
 
 # Jenkins Plugins to install
+# (only install once, as plugins persist due to volume mounts)
 AnsiColor
 Azure Credentials
 PowerShell
-timestamper
+Timestamper
 
 # Show logs to see admin unlock code
 docker container logs jenkins
@@ -23,10 +24,15 @@ docker container logs jenkins
 docker container exec -it jenkins bash
 
 # Pull latest image version
+# (updates if local already present)
 docker pull jenkinsci/blueocean
 
 # Check image version
 docker image ls jenkinsci/blueocean
+# Show all image info
+docker image inspect jenkinsci/blueocean
+# Show image digest (to compare with Docker Hub DIGEST)
+docker image inspect --format='{{.RepoDigests}}' jenkinsci/blueocean
 
 # Check running containers
 docker container ls

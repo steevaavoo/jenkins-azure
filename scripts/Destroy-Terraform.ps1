@@ -2,7 +2,7 @@
 Push-Location -Path .\terraform
 
 # Apply terraform
-$message = "Destroying Terraform environment"
+$message = "Destroying Terraform configuration"
 Write-Output "`nSTARTED: $message..."
 terraform destroy -auto-approve
 Write-Output "FINISHED: $message."
