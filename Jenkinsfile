@@ -61,7 +61,7 @@ pipeline {
       options {
         // Use "activity: true" to timeout after inactivity
         // Use "activity: false" to continue after inactivity
-        timeout(activity: false, time: 1, unit: 'MINUTES')
+        timeout(time: 1, unit: 'MINUTES')
       }
       steps {
         pwsh(script: './scripts/Plan-Terraform.ps1')
