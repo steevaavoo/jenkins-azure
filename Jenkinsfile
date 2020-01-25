@@ -29,7 +29,7 @@ pipeline {
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
     DNS_DOMAIN_NAME = 'thehypepipe.co.uk'
     LOCATION = 'eastus'
-    //STORAGE_KEY  = 'env var set by Get-StorageKey.ps1'
+    //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
   }
@@ -58,12 +58,12 @@ pipeline {
 
     stage('Build') {
       when {not { expression { params.TERRAFORM_DELETE} }}
-      options {
-        // "activity" param doesn't work as expected, so not currently using
-        // Use "activity: true" to timeout after inactivity
-        // Use "activity: false" to continue after inactivity
-        timeout(time: 5, unit: 'MINUTES')
-      }
+      // options {
+      //   "activity" param doesn't work as expected, so not currently using
+      //   Use "activity: true" to timeout after inactivity
+      //   Use "activity: false" to continue after inactivity
+      //   timeout(time: 5, unit: 'MINUTES')
+      // }
       steps {
         pwsh(script: './scripts/Plan-Terraform.ps1')
         script {
@@ -74,14 +74,16 @@ pipeline {
           env.TF_CHANGES_EXIST=pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
           echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
 
-
           // Evaluate the env var within Jenkins process, or within an external script
           // Jenkins: env.TF_CHANGES_EXIST
           // PowerShell: $env:TF_CHANGES_EXIST
           // bash: $TF_CHANGES_EXIST
           if (env.TF_CHANGES_EXIST == "True") {
-            input 'Changes found in TF plan. Continue Terraform Apply?'
-            pwsh(script: './scripts/Apply-Terraform.ps1')
+            timeout(activity: true, time: 1) {
+              // TODO: Add TF diff summmary to input prompt?
+              input 'Changes found in TF plan. Continue Terraform Apply?'
+              pwsh(script: './scripts/Apply-Terraform.ps1')
+            }
           } else {
             echo "SKIPPING: Terraform apply - no changes"
           }
