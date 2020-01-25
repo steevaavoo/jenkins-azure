@@ -6,7 +6,7 @@ Push-Location -Path .\terraform
 
 # Download required TF resources
 $message = "Initialising Terraform environment"
-Write-Output "`nSTARTED: $message..."
+Write-Output "STARTED: $message..."
 terraform init
 Write-Output "FINISHED: $message."
 

@@ -3,7 +3,7 @@ Push-Location -Path .\terraform
 
 # Plan with differential output
 $message = "Planning Terraform configuration"
-Write-Output "`nSTARTED: $message..."
+Write-Output "STARTED: $message..."
 terraform plan -out=tfplan
 Write-Output "FINISHED: $message."
 
