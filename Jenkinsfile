@@ -3,9 +3,10 @@ pipeline {
   // triggers { pollSCM('* * * * *') } // Poll every minute
 
   parameters {
-    booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
     booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
+    booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
+    booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
   }
 
   agent {
@@ -92,7 +93,7 @@ pipeline {
       }
     }
 
-    stage('DeployK8s') {
+    stage('Deploy-Kubernetes') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: './scripts/Deploy-Manifests.ps1')
@@ -100,7 +101,14 @@ pipeline {
       }
     }
 
-    stage('TerraformDestroy') {
+    stage('Test') {
+      when {not { expression { params.TERRAFORM_DELETE} }}
+      steps {
+        pwsh(script: './scripts/test.ps1')
+      }
+    }
+
+    stage('Destroy-Terraform') {
       when { expression { params.TERRAFORM_DELETE} }
       options { retry(3) }
       steps {
@@ -108,7 +116,7 @@ pipeline {
       }
     }
 
-    stage('StorageDestroy') {
+    stage('Destroy-Storage') {
       when { expression { params.STORAGE_DELETE} }
       options { retry(3) }
       steps {
