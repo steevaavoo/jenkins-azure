@@ -60,7 +60,8 @@ pipeline {
       when {not { expression { params.TERRAFORM_DELETE} }}
       options {
         // Use "activity: true" to timeout after inactivity
-        timeout(activity: true, time: 1, unit: 'MINUTES')
+        // Use "activity: false" to continue after inactivity
+        timeout(activity: false, time: 1, unit: 'MINUTES')
       }
       steps {
         pwsh(script: './scripts/Plan-Terraform.ps1')
