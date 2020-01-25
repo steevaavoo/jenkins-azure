@@ -19,14 +19,18 @@ pipeline {
   }
 
   environment {
+    // CONTAINER_REGISTRY_NAME = 'stvcontreg1'
+    // CONTAINER_REGISTRY_REPOSITORY = 'samples/nodeapp'
     //STORAGE_KEY  = 'willbefetchedbyscript'
+    ACR_FQDN = "${ACR_NAME}.azurecr.io"
+    ACR_NAME = 'stvcontreg1'
     AKS_CLUSTER_NAME = 'stvaks1'
+    AKS_IMAGE = "${ACR_FQDN}/${CONTAINER_IMAGE_TAG_FULL}"
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'
-    CONTAINER_REGISTRY_NAME = 'stvcontreg1'
-    CONTAINER_REGISTRY_REPOSITORY = 'samples/nodeapp'
-    ACR_REPOSITORY = "${CONTAINER_REGISTRY_NAME}.azurecr.io/${CONTAINER_REGISTRY_REPOSITORY}:${CONTAINER_IMAGE_TAG}"
+    CONTAINER_IMAGE_NAME = 'nodeapp'
     CONTAINER_IMAGE_TAG = 'latest'
+    CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
     DNS_DOMAIN_NAME = 'thehypepipe.co.uk'
     LOCATION = 'eastus'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
@@ -65,6 +69,8 @@ pipeline {
         script {
           // Example of a PowerShell script returning a boolean ($true or $false) to an Jenkins env var
           echo "running Test-TFChangesExist.ps1"
+          // NOTE: Use '$VerbosePreference = "Continue"' in PowerShell script to capture Verbose stream
+          // NOTE: Use '$ErrorActionPreference = "Stop"' in PowerShell script to ensure build stops on errors
           env.TF_CHANGES_EXIST=pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
           echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
 

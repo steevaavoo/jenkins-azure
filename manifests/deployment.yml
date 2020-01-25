@@ -12,6 +12,6 @@ spec:
       containers:
         - name: nodeapp
           # image: nginxdemos/hello
-          image: __ACR_REPOSITORY__
+          image: __AKS_IMAGE__
           ports:
           - containerPort: 80
