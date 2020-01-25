@@ -10,7 +10,6 @@ variable "acr_sku" {
   default = "Basic"
 }
 
-
 variable "aks_dns_prefix" {
   default = "stvagent1"
 }

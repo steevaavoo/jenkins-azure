@@ -7,7 +7,6 @@ az acr login --name $env:ACR_NAME
 # Format: repo/image:tag
 # docker build . -t adamrushuk/nodeapp:latest
 
-
 # ACR build
 $message = "Building docker image via ACR"
 Write-Output "STARTED: $message..."

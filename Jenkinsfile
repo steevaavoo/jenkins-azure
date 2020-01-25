@@ -7,9 +7,6 @@ pipeline {
     booleanParam name: 'storage_delete', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
   }
 
-  // Variable for Container Ingress IP
-  // def ingress_ip = 'ToBeUpdated'
-
   agent {
       docker {
           image 'adamrushuk/psjenkinsagent:latest'
@@ -19,9 +16,6 @@ pipeline {
   }
 
   environment {
-    // CONTAINER_REGISTRY_NAME = 'stvcontreg1'
-    // CONTAINER_REGISTRY_REPOSITORY = 'samples/nodeapp'
-    //STORAGE_KEY  = 'willbefetchedbyscript'
     ACR_FQDN = "${ACR_NAME}.azurecr.io"
     ACR_NAME = 'stvcontreg1'
     AKS_CLUSTER_NAME = 'stvaks1'
@@ -33,6 +27,7 @@ pipeline {
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
     DNS_DOMAIN_NAME = 'thehypepipe.co.uk'
     LOCATION = 'eastus'
+    //STORAGE_KEY  = 'env var set by Get-StorageKey.ps1'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
   }
@@ -54,7 +49,6 @@ pipeline {
         pwsh(script: './scripts/Create-AzStorage.ps1')
         // To share env vars between external scripts, you can call multiple scripts in a single line
         pwsh(script: './scripts/Get-StorageKey.ps1 ; ./scripts/Replace-Tokens.ps1')
-        // pwsh(script: './scripts/Replace-Tokens.ps1')
         pwsh(script: './scripts/Init-Terraform.ps1')
       }
     }
@@ -93,7 +87,6 @@ pipeline {
       when {not { expression { params.terraform_delete} }}
       steps {
         pwsh(script: './scripts/Build-DockerImage.ps1')
-        // pwsh(script: './scripts/Push-DockerImage.ps1')
       }
     }
 

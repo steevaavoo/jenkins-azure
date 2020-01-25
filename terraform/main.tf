@@ -39,13 +39,6 @@ resource "azurerm_kubernetes_cluster" "stvaks" {
     os_disk_size_gb = var.agent_pool_profile_disk_size_gb
   }
 
-  # agent_pool_profile {
-  #   name            = var.agent_pool_profile_name
-  #   count           = var.agent_pool_count
-  #   vm_size         = var.agent_pool_profile_vm_size
-  #   os_type         = var.agent_pool_profile_os_type
-  # }
-
   service_principal {
     client_id     = var.service_principal_client_id
     client_secret = var.service_principal_client_secret
