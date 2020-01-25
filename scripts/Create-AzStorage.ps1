@@ -1,0 +1,30 @@
+# This will create an Azure resource group, Storage account and Storage container, used to store terraform remote state
+
+# DEBUG: Output environment variables
+#ls env:
+
+# Login to Az
+az login --service-principal --tenant $env:ARM_TENANT_ID -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET
+az account set --subscription $env:ARM_SUBSCRIPTION_ID
+
+# Resource Group
+Write-Output "`nSTARTED: Creating Resource Group..."
+az group create --location $env:LOCATION --name $env:TERRAFORM_STORAGE_RG
+Write-Output "FINISHED: Creating Resource Group."
+
+# Storage Account
+Write-Output "`nSTARTED: Creating Storage Account..."
+az storage account create --name $env:TERRAFORM_STORAGE_ACCOUNT --resource-group $env:TERRAFORM_STORAGE_RG --location $env:LOCATION --sku Standard_LRS
+Write-Output "FINISHED: Creating Storage Account."
+
+# Storage Container
+Write-Output "`nSTARTED: Creating Storage Container..."
+az storage container create --name "terraform" --account-name $env:TERRAFORM_STORAGE_ACCOUNT
+Write-Output "FINISHED: Creating Storage Container."
+
+# Get latest supported AKS version and update Azure DevOps Pipeline variable
+Write-Output "`nSTARTED: Finding latest supported AKS version..."
+$latest_aks_version = $(az aks get-versions -l $env:LOCATION --query "orchestrators[-1].orchestratorVersion" -o tsv)
+Write-Output "Updating Pipeline variable with Latest AKS Version:"
+Write-Output $latest_aks_version
+Write-Output "FINISHED: Finding latest supported AKS version."
