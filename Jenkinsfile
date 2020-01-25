@@ -58,12 +58,10 @@ pipeline {
 
     stage('Build') {
       when {not { expression { params.TERRAFORM_DELETE} }}
-      // options {
-      //   "activity" param doesn't work as expected, so not currently using
-      //   Use "activity: true" to timeout after inactivity
-      //   Use "activity: false" to continue after inactivity
-      //   timeout(time: 5, unit: 'MINUTES')
-      // }
+      options {
+        // Timeout for whole Stage
+        timeout(time: 1, unit: 'HOURS')
+      }
       steps {
         pwsh(script: './scripts/Plan-Terraform.ps1')
         script {
@@ -79,11 +77,16 @@ pipeline {
           // PowerShell: $env:TF_CHANGES_EXIST
           // bash: $TF_CHANGES_EXIST
           if (env.TF_CHANGES_EXIST == "True") {
-            timeout(activity: false, time: 1) {
+
+            //   "activity" param doesn't work as expected, so not currently using
+            //   Use "activity: true" to timeout after inactivity
+            //   Use "activity: false" to continue after inactivity
+            timeout(activity: false, time: 5) {
               // TODO: Add TF diff summmary to input prompt?
               input 'Changes found in TF plan. Continue Terraform Apply?'
               pwsh(script: './scripts/Apply-Terraform.ps1')
             }
+
           } else {
             echo "SKIPPING: Terraform apply - no changes"
           }
