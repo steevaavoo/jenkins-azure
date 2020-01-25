@@ -79,7 +79,7 @@ pipeline {
           // PowerShell: $env:TF_CHANGES_EXIST
           // bash: $TF_CHANGES_EXIST
           if (env.TF_CHANGES_EXIST == "True") {
-            timeout(activity: true, time: 1) {
+            timeout(activity: false, time: 1) {
               // TODO: Add TF diff summmary to input prompt?
               input 'Changes found in TF plan. Continue Terraform Apply?'
               pwsh(script: './scripts/Apply-Terraform.ps1')
