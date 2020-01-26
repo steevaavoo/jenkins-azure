@@ -23,6 +23,7 @@
 - [x] Add improved output to all scripts, esp. az cli scripts with no current output (`Destroy-Storage.ps1`)
 - [x] Add [`az acr build`](https://docs.microsoft.com/en-us/cli/azure/acr?view=azure-cli-latest#az-acr-build) step - instead of local docker build / push
 - [x] Add Pester tests with junit output
+- [ ] Add clock example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Add Terraform diff summary within input prompt (single line summary, or one line per resource)
 - [ ] Add dynamic check to skip Docker build stage if image tag hasn't changed
 - [ ] Add Helm for Kubernetes releases
