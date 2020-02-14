@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/powershell:6.2.3-centos-7
 
 # Versions
-ENV TERRAFORM_VERSION=0.12.19
+ENV TERRAFORM_VERSION=0.12.20
 ENV DOCKER_VERSION=19.03.5
-ENV KUBECTL_VERSION=v1.17.1
+ENV KUBECTL_VERSION=v1.17.3
 
 # Metadata as defined at http://label-schema.org
 LABEL maintainer="Adam Rush" \
@@ -29,7 +29,7 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBECTL
     mv ./kubectl /usr/local/bin/kubectl
 
 # Install yum packages
-RUN yum install -y wget unzip jq
+RUN yum install -y wget unzip jq git
 
 # Install Terraform
 RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
