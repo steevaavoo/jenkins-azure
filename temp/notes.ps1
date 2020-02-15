@@ -164,4 +164,9 @@ helm list -A
 
 kubectl get all -n ingress-basic
 
+# Cleanup
+helm uninstall aks-helloworld --namespace ingress-basic
+helm uninstall aks-helloworld-two --namespace ingress-basic
+helm uninstall nginx-ingress --namespace ingress-basic
+
 #endregion Helm
