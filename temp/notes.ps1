@@ -127,3 +127,41 @@ kubectl get pod $podName --watch
 kubectl get svc azure-vote-front --watch
 
 #endregion Kubectl
+
+
+#region Helm
+
+# Create a namespace for your ingress resources
+kubectl create namespace ingress-basic
+
+# Add the official stable repository
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo update
+
+# Use Helm to deploy an NGINX ingress controller
+helm install nginx-ingress stable/nginx-ingress `
+    --namespace ingress-basic `
+    --set controller.replicaCount=2 `
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+kubectl get service -l app=nginx-ingress --namespace ingress-basic
+
+
+helm repo add azure-samples https://azure-samples.github.io/helm-charts/
+
+helm install aks-helloworld azure-samples/aks-helloworld --namespace ingress-basic
+
+helm install aks-helloworld-two azure-samples/aks-helloworld `
+    --namespace ingress-basic `
+    --set title="AKS Ingress Demo" `
+    --set serviceName="aks-helloworld-two"
+
+
+kubectl apply -f ./manifests/ingress.yml
+kubectl get ingress -A
+helm list -A
+
+kubectl get all -n ingress-basic
+
+#endregion Helm

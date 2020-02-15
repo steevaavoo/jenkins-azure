@@ -108,6 +108,7 @@ pipeline {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: './scripts/Deploy-Manifests.ps1')
+        pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
         pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
       }
     }
