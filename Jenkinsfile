@@ -84,8 +84,9 @@ pipeline {
             timeout(activity: false, time: 5) {
               // TODO: Add TF diff summmary to input prompt?
               input 'Changes found in TF plan. Continue Terraform Apply?'
-              pwsh(script: './scripts/Apply-Terraform.ps1')
             }
+
+            pwsh(script: './scripts/Apply-Terraform.ps1')
 
           } else {
             echo "SKIPPING: Terraform apply - no changes"
