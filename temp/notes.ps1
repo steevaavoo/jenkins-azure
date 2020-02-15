@@ -53,20 +53,24 @@ docker container start jenkins
 
 
 #region Jenkins Agent
-# Build
+# https://hub.docker.com/r/adamrushuk/psjenkinsagent
+# Build dated and latest tags
 Push-Location .\agent
-docker build . -t adamrushuk/psjenkinsagent:2020-01-21
-docker build . -t adamrushuk/psjenkinsagent:latest
+$tag = "2020-01-25"
+$dockerImage = "adamrushuk/psjenkinsagent"
+$dockerImageAndTag = "$($dockerImage):$tag"
+$dockerImageAndLatestTag = "$($dockerImage):latest"
+docker build . -t $dockerImageAndTag
+docker tag $dockerImageAndTag $dockerImageAndLatestTag
 
 # Show
 docker image ls adamrushuk/psjenkinsagent
 
 # Push
-docker push adamrushuk/psjenkinsagent:2020-01-21
-docker push adamrushuk/psjenkinsagent:latest
+docker push adamrushuk/psjenkinsagent:$tag ; docker push adamrushuk/psjenkinsagent:latest
 
 # Run
-docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest bash
+docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest pwsh
 #endregion Jenkins Agent
 
 

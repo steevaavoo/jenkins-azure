@@ -1,12 +1,5 @@
 # This will create an Azure resource group, Storage account and Storage container, used to store terraform remote state
 
-# DEBUG: Output environment variables
-#ls env:
-
-# Login to Az
-az login --service-principal --tenant $env:ARM_TENANT_ID -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET
-az account set --subscription $env:ARM_SUBSCRIPTION_ID
-
 # Resource Group
 Write-Output "`nSTARTED: Creating Resource Group..."
 az group create --location $env:LOCATION --name $env:TERRAFORM_STORAGE_RG
