@@ -23,7 +23,7 @@ param (
     $ApiKey,
     $ApiSecret,
     $Ttl = 600,
-    $ServiceName = 'nodeapp'
+    $ServiceName = 'azure-vote-front'
 )
 
 $ErrorActionPreference = "Stop"
