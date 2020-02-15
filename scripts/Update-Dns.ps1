@@ -38,7 +38,7 @@ Write-Output "FINISHED: $message."
 # Wait for Loadbalancer IP to exist
 $timer = [Diagnostics.Stopwatch]::StartNew()
 
-while (-not ($IPAddress = kubectl get service -l $ServiceLabel --namespace $NameSpace --ignore-not-found -o jsonpath="{.status.loadBalancer.ingress[0].ip}")) {
+while (-not ($IPAddress = kubectl get service -l $ServiceLabel --namespace $NameSpace --ignore-not-found -o jsonpath="{.items[0].status.loadBalancer.ingress[0].ip}")) {
 
     if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
         Write-Host "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
