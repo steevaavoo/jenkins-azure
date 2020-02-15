@@ -55,22 +55,23 @@ docker container start jenkins
 #region Jenkins Agent
 # https://hub.docker.com/r/adamrushuk/psjenkinsagent
 # Build dated and latest tags
+$dockerUser = "steevaavoo"
 Push-Location .\agent
-$tag = "2020-01-25"
-$dockerImage = "adamrushuk/psjenkinsagent"
+$tag = (Get-Date -Format "yyyy-MM-dd")
+$dockerImage = "$dockerUser/psjenkinsagent"
 $dockerImageAndTag = "$($dockerImage):$tag"
 $dockerImageAndLatestTag = "$($dockerImage):latest"
 docker build . -t $dockerImageAndTag
 docker tag $dockerImageAndTag $dockerImageAndLatestTag
 
 # Show
-docker image ls adamrushuk/psjenkinsagent
+docker image ls $dockerUser/psjenkinsagent
 
 # Push
-docker push adamrushuk/psjenkinsagent:$tag ; docker push adamrushuk/psjenkinsagent:latest
+docker push $dockerUser/psjenkinsagent:$tag ; docker push $dockerUser/psjenkinsagent:latest
 
 # Run
-docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest pwsh
+docker run --rm -it --name jenkins-agent $dockerUser/psjenkinsagent:latest pwsh
 #endregion Jenkins Agent
 
 
@@ -91,3 +92,38 @@ docker run -p 8080:8080 -it -d --rm --name nodeapp adamrushuk/nodeapp:multistage
 docker container ls
 docker kill nodeapp
 #endregion Node App
+
+#region Kubectl
+
+# Downloading latest credentials for AKS Cluster
+az aks get-credentials --resource-group aks-rg --name stvaks1 --overwrite-existing
+
+# See what's running
+kubectl get node
+
+kubectl get ns
+kubectl get all, pv, pvc
+
+# Custom Storage Class
+# Show default yaml
+kubectl get sc default -o yaml --export
+
+# Create custom storage class (with "reclaimPolicy: Retain")
+https://docs.microsoft.com/en-us/azure/aks/concepts-storage#storage-classes
+
+# Apply manifests
+kubectl apply --validate -f ./manifests/azure-vote.yml
+
+# Check
+kubectl get sc, pvc, pv, all
+kubectl get events --sort-by=.metadata.creationTimestamp -w
+$podName = kubectl get pod -l app=azure-vote-front -o jsonpath="{.items[0].metadata.name}"
+$podName = kubectl get pod -l app=azure-vote-back -o jsonpath="{.items[0].metadata.name}"
+kubectl describe pod $podName
+kubectl top pod $podName
+
+# Wait for pod to be ready
+kubectl get pod $podName --watch
+kubectl get svc azure-vote-front --watch
+
+#endregion Kubectl
