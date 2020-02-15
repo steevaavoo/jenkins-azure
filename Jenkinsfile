@@ -7,11 +7,13 @@ pipeline {
     booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
     booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
+    choice       name: 'DNS_DOMAIN_NAME', choices: ['bakers-foundry.co.uk', 'thehypepipe.co.uk'], description: 'Selecting between Steve\'s Domain Name and Adam\'s Domain Name for collaborative builds.'
+    choice       name: 'DOCKER_REPO',choices: ['steevaavoo', 'adamrushuk'], description: 'Selecting between Steve\'s Docker Repository and Adam\'s Docker Repository for collaborative builds.'
   }
 
   agent {
       docker {
-          image 'adamrushuk/psjenkinsagent:latest'
+          image "${DOCKER_REPO}/psjenkinsagent:latest"
           //label 'my-defined-label'
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
@@ -27,7 +29,7 @@ pipeline {
     CONTAINER_IMAGE_NAME = 'nodeapp'
     CONTAINER_IMAGE_TAG = 'latest'
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
-    DNS_DOMAIN_NAME = 'thehypepipe.co.uk'
+    // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
     LOCATION = 'eastus'
     //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
