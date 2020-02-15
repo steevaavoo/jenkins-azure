@@ -1,4 +1,8 @@
-#region Helm
+# Setting k8s current context
+$message = "Merging AKS credentials"
+Write-Output "`nSTARTED: $message..."
+az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
+Write-Output "FINISHED: $message."
 
 # Create a namespace for your ingress resources
 kubectl create namespace ingress-basic
