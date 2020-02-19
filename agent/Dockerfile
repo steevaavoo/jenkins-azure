@@ -30,7 +30,8 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBECTL
     mv ./kubectl /usr/local/bin/kubectl
 
 # Install yum packages
-RUN yum install -y wget unzip jq git
+RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm && \
+    yum install -y wget unzip jq git which dotnet-sdk-3.1
 
 # Install Terraform
 RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
