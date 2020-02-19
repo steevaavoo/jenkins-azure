@@ -9,7 +9,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - http:
+  - host: __DNS_DOMAIN_NAME__
+    http:
       paths:
       - backend:
           serviceName: azure-vote-front
@@ -31,7 +32,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /static/$2
 spec:
   rules:
-  - http:
+  - host: __DNS_DOMAIN_NAME__
+    http:
       paths:
       - backend:
           serviceName: aks-helloworld
