@@ -19,7 +19,7 @@ variable "azure_resourcegroup_name" {
 }
 
 variable "location" {
-  default = "East US"
+  default = "uksouth"
 }
 
 variable "agent_pool_count" {
