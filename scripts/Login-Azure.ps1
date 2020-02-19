@@ -4,5 +4,5 @@
 if ($env:CI_DEBUG -eq "true") { Get-ChildItem env: | Select-Object Name, Value }
 
 # Login to Az
-az login --service-principal --tenant $env:ARM_TENANT_ID -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET
+az login --service-principal --tenant $env:ARM_TENANT_ID -u $env:ARM_CLIENT_ID -p $env:ARM_CLIENT_SECRET | Out-Null
 az account set --subscription $env:ARM_SUBSCRIPTION_ID
