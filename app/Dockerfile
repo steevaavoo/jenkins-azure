@@ -7,5 +7,5 @@ RUN npm ci --only=production
 # Final stage
 FROM gcr.io/distroless/nodejs
 COPY --from=build /app /
-EXPOSE 8080
+EXPOSE 80
 CMD ["server.js"]

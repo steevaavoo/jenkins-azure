@@ -18,7 +18,7 @@ spec:
         path: /(.*)
       - backend:
           serviceName: nodeapp
-          servicePort: 8080
+          servicePort: 80
         path: /helloworld(/|$)(.*)
 ---
 apiVersion: extensions/v1beta1
