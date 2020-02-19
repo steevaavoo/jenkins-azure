@@ -6,7 +6,7 @@ az acr login --name $env:ACR_NAME
 # Skip build if tag already exists in acr
 $acrRepoTags = az acr repository show-tags --name $env:ACR_NAME --repository $env:CONTAINER_IMAGE_NAME | ConvertFrom-Json
 
-if ($env:CONTAINER_IMAGE_TAG -in $acrRepoTags -or $env:FORCE_CONTAINER_BUILD) {
+if (($env:CONTAINER_IMAGE_TAG -in $acrRepoTags) -or ($env:FORCE_CONTAINER_BUILD -eq "true")) {
     Write-Output "SKIPPING: Building docker image via ACR...[CONTAINER_IMAGE_TAG '$env:CONTAINER_IMAGE_TAG'] already exists."
 } else {
     # Local build
