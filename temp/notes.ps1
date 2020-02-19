@@ -56,7 +56,7 @@ docker container start jenkins
 # https://hub.docker.com/r/adamrushuk/psjenkinsagent
 # Build dated and latest tags
 Push-Location .\agent
-$tag = "2020-01-25"
+$tag = "2020-02-14"
 $dockerImage = "adamrushuk/psjenkinsagent"
 $dockerImageAndTag = "$($dockerImage):$tag"
 $dockerImageAndLatestTag = "$($dockerImage):latest"
