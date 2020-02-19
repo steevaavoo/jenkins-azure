@@ -39,7 +39,7 @@ Describe "Integration Tests" {
         }
 
         It "Container Repository [$env:CONTAINER_IMAGE_NAME] should exist" {
-            az acr repository show --name $env:ACR_NAME --image $env:CONTAINER_IMAGE_TAG_FULL --query "name" -o tsv | Should be "latest"
+            az acr repository show --name $env:ACR_NAME --image $env:CONTAINER_IMAGE_TAG_FULL --query "name" -o tsv | Should be $env:CONTAINER_IMAGE_TAG
         }
     }
 
