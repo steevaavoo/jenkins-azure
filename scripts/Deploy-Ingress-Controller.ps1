@@ -1,3 +1,6 @@
+# Deploy an AKS Ingress Controller
+$ErrorActionPreference = "Stop"
+
 # Setting k8s current context
 $message = "Merging AKS credentials"
 Write-Output "`nSTARTED: $message..."
