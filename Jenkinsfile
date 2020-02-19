@@ -27,7 +27,7 @@ pipeline {
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'
     CONTAINER_IMAGE_NAME = 'nodeapp'
-    CONTAINER_IMAGE_TAG = 'latest'
+    CONTAINER_IMAGE_TAG = '2020-02-19'
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
     // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
     LOCATION = 'uksouth'
