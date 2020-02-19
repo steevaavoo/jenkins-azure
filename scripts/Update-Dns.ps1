@@ -41,11 +41,11 @@ $timer = [Diagnostics.Stopwatch]::StartNew()
 while (-not ($IPAddress = kubectl get service -l $ServiceLabel --namespace $NameSpace --ignore-not-found -o jsonpath="{.items[0].status.loadBalancer.ingress[0].ip}")) {
 
     if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
-        Write-Host "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
+        Write-Output "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
         exit 1
     } else {
-        Write-Host "Current Loadbalancer IP value: [$IPAddress]"
-        Write-Host "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
+        Write-Output "Current Loadbalancer IP value: [$IPAddress]"
+        Write-Output "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
         Start-Sleep -Seconds $RetryIntervalSeconds
     }
 }
@@ -53,8 +53,8 @@ while (-not ($IPAddress = kubectl get service -l $ServiceLabel --namespace $Name
 $timer.Stop()
 
 # Update pipeline variable
-Write-Host "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
-Write-Host "Found IP [$IPAddress]"
+Write-Output "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
+Write-Output "Found IP [$IPAddress]"
 
 # Init
 $message = "Installing GoDaddy PowerShell module"
@@ -78,9 +78,9 @@ Write-Output "FINISHED: $message."
 
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
-Write-Host "STARTED: $message"
+Write-Output "STARTED: $message"
 Set-GDDomainRecord -credentials $apiCredential -domain $DomainName -name '@' -ipaddress $IPAddress -type "A" -ttl $Ttl -Force
-Write-Host "FINISHED: $message"
+Write-Output "FINISHED: $message"
 
 # Output updated records
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
