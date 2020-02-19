@@ -30,7 +30,7 @@ pipeline {
     CONTAINER_IMAGE_TAG = 'latest'
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
     // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
-    LOCATION = 'eastus'
+    LOCATION = 'uksouth'
     //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'

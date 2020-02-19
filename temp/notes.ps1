@@ -1,14 +1,26 @@
 #region Jenkins blueocean
+# Start Docker Desktop, or Docker-Machine (if using VirtualBox setup)
+docker-machine start
+
+# Load env vars for docker cli
+& docker-machine env --shell powershell default | Invoke-Expression
+gci env:DOCKER*
+
 # Open http://localhost:8080
+# for docker-machine, use IP shown from "docker-machine ip"
+# eg: http://192.168.99.104:8080/
 docker run `
     --rm -d `
     -u root `
     -p 8080:8080 `
     -v jenkins-data:/var/jenkins_home `
     -v /var/run/docker.sock:/var/run/docker.sock `
-    -v ${HOME}:/home `
+    -v /c/Users/$env:USERNAME:/home `
     --name jenkins `
     jenkinsci/blueocean
+
+# Show logs to see admin unlock code
+docker container logs jenkins
 
 # Jenkins Plugins to install
 # (only install once, as plugins persist due to volume mounts)
@@ -17,8 +29,8 @@ Azure Credentials
 PowerShell
 Timestamper
 
-# Show logs to see admin unlock code
-docker container logs jenkins
+# Use BlueOcean to add existing GitHub repo containing a Jenkinsfile
+http://<JenkinsUrl>:8080/blue/create-pipeline
 
 # Attach to container into a bash shell
 docker container exec -it jenkins bash
@@ -55,7 +67,7 @@ docker container start jenkins
 #region Jenkins Agent
 # https://hub.docker.com/r/adamrushuk/psjenkinsagent
 # Build dated and latest tags
-$dockerUser = "steevaavoo"
+$dockerUser = "adamrushuk"
 Push-Location .\agent
 $tag = (Get-Date -Format "yyyy-MM-dd")
 $dockerImage = "$dockerUser/psjenkinsagent"
