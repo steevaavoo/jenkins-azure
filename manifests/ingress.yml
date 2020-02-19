@@ -17,23 +17,23 @@ spec:
         path: /(.*)
       - backend:
           serviceName: nodeapp
-          servicePort: 80
+          servicePort: 8080
         path: /helloworld(/|$)(.*)
-# ---
-# apiVersion: extensions/v1beta1
-# kind: Ingress
-# metadata:
-#   name: hello-world-ingress-static
-#   namespace: ingress-basic
-#   annotations:
-#     kubernetes.io/ingress.class: nginx
-#     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-#     nginx.ingress.kubernetes.io/rewrite-target: /static/$2
-# spec:
-#   rules:
-#   - http:
-#       paths:
-#       - backend:
-#           serviceName: aks-helloworld
-#           servicePort: 80
-#         path: /static(/|$)(.*)
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello-world-ingress-static
+  namespace: ingress-basic
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /static/$2
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: aks-helloworld
+          servicePort: 80
+        path: /static(/|$)(.*)
