@@ -16,6 +16,6 @@ Write-Output "`nSTARTED: $message..."
 kubectl apply -f ./manifests
 Write-Output "FINISHED: $message."
 
-# Assemble and show App URL
-$appurl = kubectl get svc nodeapp --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
-Write-Output "Browse to app with: [$appurl]"
+# Show ingress URL
+$url = kubectl get svc nginx-ingress-controller -n ingress-basic --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
+Write-Output "Browse to ingress URL: [$url]"
