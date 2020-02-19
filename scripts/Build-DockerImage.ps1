@@ -6,7 +6,10 @@ az acr login --name $env:ACR_NAME
 # Skip build if tag already exists in acr
 $acrRepoTags = az acr repository show-tags --name $env:ACR_NAME --repository $env:CONTAINER_IMAGE_NAME | ConvertFrom-Json
 
-if (($env:CONTAINER_IMAGE_TAG -notin $acrRepoTags) -or $env:FORCE_CONTAINER_BUILD) {
+if (($env:CONTAINER_IMAGE_TAG -notin $acrRepoTags) -or ($env:FORCE_CONTAINER_BUILD -eq "true")) {
+
+    Write-Output "FORCE_CONTAINER_BUILD param: [$env:FORCE_CONTAINER_BUILD]"
+
     # Local build
     # Format: repo/image:tag
     # docker build . -t adamrushuk/nodeapp:latest

@@ -59,7 +59,7 @@ Describe "Integration Tests" {
     Context "When DNS record has been updated for: [$env:DNS_DOMAIN_NAME]" {
 
         $testUrl = "http://$($env:DNS_DOMAIN_NAME)"
-        $allowedStatusCodes = @(200, 503)
+        $allowedStatusCodes = @(200, 404, 503)
         It "Resource Group [$testUrl] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
             $responseStatusCode = curl -s -o /dev/null -w "%{http_code}" http://thehypepipe.co.uk
             $responseStatusCode | Should BeIn $allowedStatusCodes
