@@ -220,6 +220,9 @@ kubectl logs -f -l component=controller --all-containers=true
 kubectl get pods
 kubectl exec -it $ingressControllerPodName cat /etc/nginx/nginx.conf > nginx.conf
 
+# Check Stats within Controller pod
+kubectl exec -it $ingressControllerPodName /bin/bash
+curl http://localhost/nginx_status
 
 # Check if used Services Exist
 kubectl get svc --all-namespaces

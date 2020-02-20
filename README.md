@@ -24,9 +24,9 @@
 - [x] Add [`az acr build`](https://docs.microsoft.com/en-us/cli/azure/acr?view=azure-cli-latest#az-acr-build) step - instead of local docker build / push
 - [x] Add Pester tests with junit output
 - [x] Add dynamic check to skip Docker build stage if image tag hasn't changed
+- [x] Fix ingress rules
 - [ ] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
-- [ ] Fix ingress rules
-- [ ] Add clock example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
+- [ ] Add clock (or another better) example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Add Terraform diff summary within input prompt (single line summary, or one line per resource)
 - [ ] Add Helm for Kubernetes releases
 - [ ] Complete this README with proper usage instructions
