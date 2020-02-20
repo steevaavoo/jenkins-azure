@@ -15,7 +15,7 @@ spec:
       - backend:
           serviceName: azure-vote-front
           servicePort: 80
-        path: (/|$)
+        path: /(.*)
       - backend:
           serviceName: nodeapp
           servicePort: 80
