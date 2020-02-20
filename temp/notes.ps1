@@ -144,9 +144,12 @@ kubectl get svc azure-vote-front --watch
 
 
 #region Helm
-
 # Create a namespace for your ingress resources
 kubectl create namespace ingress-basic
+
+# * IMPORTANT
+# permanently save the namespace for all subsequent kubectl commands in that context
+kubectl config set-context --current --namespace=ingress-basic
 
 # Add the official stable repository
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
@@ -176,7 +179,7 @@ kubectl apply -f ./manifests/ingress.yml
 kubectl get ingress -A
 helm list -A
 
-kubectl get all -n ingress-basic
+kubectl get all
 #endregion Helm
 
 
@@ -195,34 +198,42 @@ curl.exe -I -k http://thehypepipe.co.uk/helloworld
 # - default-backend-service will show when ingress not configured correctly or it does not have endpoints
 # - ensure the ingress namespace matches the service namespaces
 
+# * IMPORTANT
+# permanently save the namespace for all subsequent kubectl commands in that context
+kubectl config set-context --current --namespace=ingress-basic
+
 # Check the Ingress Resource Events
-kubectl get ing -n ingress-basic
-kubectl get svc nginx-ingress-controller -n ingress-basic
-kubectl describe ing ingress -n ingress-basic
-kubectl describe pod nginx-ingress-controller-64c695bcf-2zhsq -n ingress-basic
+$ingressControllerPodName = kubectl get pod -l component=controller -o jsonpath="{.items[0].metadata.name}"
+kubectl get ing
+kubectl describe ing ingress
+kubectl get svc nginx-ingress-controller
+kubectl describe pod $ingressControllerPodName
 
 # Check the Ingress Controller Logs
-kubectl get pods -n ingress-basic
-kubectl logs -f -l component=controller --all-containers=true -n ingress-basic
+kubectl get pods
+kubectl logs -f -l component=controller --all-containers=true
 
 # Check the NginX Configuration
 # NginX vscode extension: https://marketplace.visualstudio.com/items?itemName=raynigon.nginx-formatter
 # Search nginx.conf for location {} blocks, including "$service_name" etc
 # Ensure $namespace, $ingress_name, $service_name, and $service_port are correct
-kubectl get pods -n ingress-basic
-kubectl exec -it -n ingress-basic nginx-ingress-controller-64c695bcf-6c755 cat /etc/nginx/nginx.conf > nginx.conf
-kubectl exec -it -n ingress-basic -l component=controller cat /etc/nginx/nginx.conf > nginx.conf
+kubectl get pods
+kubectl exec -it $ingressControllerPodName cat /etc/nginx/nginx.conf > nginx.conf
+
 
 # Check if used Services Exist
 kubectl get svc --all-namespaces
 
 # Check default backend pod
-kubectl describe pods -n ingress-basic -l component=default-backend
+kubectl describe pods -l component=default-backend
 
 # Debug Logging
-# Using the flag --v=XX it is possible to increase the level of logging. This is performed by editing the deployment
-kubectl get deploy -n ingress-basic
-kubectl edit deploy -n ingress-basic nginx-ingress-controller
+# Using the flag --v=XX it is possible to increase the level of logging.
+# This is performed by editing the deployment
+kubectl get deploy
+# Instruct kubectl to edit using vscode
+$env:KUBE_EDITOR = 'code --wait'
+kubectl edit deploy nginx-ingress-controller
 # Add --v=X to "- args", where X is an integer
 --v=2 shows details using diff about the changes in the configuration in nginx
 --v=3 shows details about the service, Ingress rule, endpoint changes and it dumps the nginx configuration in JSON format
