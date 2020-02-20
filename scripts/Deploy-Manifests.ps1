@@ -13,8 +13,7 @@ kubectl version --short
 # Apply manifests
 $message = "Applying Kubernetes manifests"
 Write-Output "`nSTARTED: $message..."
-# Create a namespace for your ingress resources
-kubectl create namespace ingress-basic
+# "ingress-basic" namespace created in Deploy-Ingress-Controller.ps1
 kubectl apply -f ./manifests -n ingress-basic
 Write-Output "FINISHED: $message."
 
