@@ -7,11 +7,14 @@ pipeline {
     booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
     booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
+    booleanParam name: 'FORCE_CONTAINER_BUILD', defaultValue: false, description: 'Forces ACR container build (true) or skips (false) when tag already exists.'
+    choice       name: 'DNS_DOMAIN_NAME', choices: ['bakers-foundry.co.uk', 'thehypepipe.co.uk'], description: 'Selecting between Steve\'s Domain Name and Adam\'s Domain Name for collaborative builds.'
+    choice       name: 'DOCKER_REPO',choices: ['steevaavoo', 'adamrushuk'], description: 'Selecting between Steve\'s Docker Repository and Adam\'s Docker Repository for collaborative builds.'
   }
 
   agent {
       docker {
-          image 'adamrushuk/psjenkinsagent:latest'
+          image "${DOCKER_REPO}/psjenkinsagent:latest"
           //label 'my-defined-label'
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
@@ -25,10 +28,10 @@ pipeline {
     AKS_RG_NAME = 'aks-rg'
     CLIENTID = 'http://tfm-k8s-spn'
     CONTAINER_IMAGE_NAME = 'nodeapp'
-    CONTAINER_IMAGE_TAG = 'latest'
+    CONTAINER_IMAGE_TAG = '2020-02-19'
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
-    DNS_DOMAIN_NAME = 'thehypepipe.co.uk'
-    LOCATION = 'eastus'
+    // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
+    LOCATION = 'uksouth'
     //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
     TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
     TERRAFORM_STORAGE_RG = 'terraform-rg'
@@ -84,8 +87,9 @@ pipeline {
             timeout(activity: false, time: 5) {
               // TODO: Add TF diff summmary to input prompt?
               input 'Changes found in TF plan. Continue Terraform Apply?'
-              pwsh(script: './scripts/Apply-Terraform.ps1')
             }
+
+            pwsh(script: './scripts/Apply-Terraform.ps1')
 
           } else {
             echo "SKIPPING: Terraform apply - no changes"
@@ -104,6 +108,7 @@ pipeline {
     stage('Deploy-Kubernetes') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
+        pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
         pwsh(script: './scripts/Deploy-Manifests.ps1')
         pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
       }

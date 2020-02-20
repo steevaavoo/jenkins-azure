@@ -39,7 +39,7 @@ Describe "Integration Tests" {
         }
 
         It "Container Repository [$env:CONTAINER_IMAGE_NAME] should exist" {
-            az acr repository show --name $env:ACR_NAME --image $env:CONTAINER_IMAGE_TAG_FULL --query "name" -o tsv | Should be "latest"
+            az acr repository show --name $env:ACR_NAME --image $env:CONTAINER_IMAGE_TAG_FULL --query "name" -o tsv | Should be $env:CONTAINER_IMAGE_TAG
         }
     }
 
@@ -58,9 +58,11 @@ Describe "Integration Tests" {
     # DNS record updated
     Context "When DNS record has been updated for: [$env:DNS_DOMAIN_NAME]" {
 
-        $testUrl = "http://$($env:DNS_DOMAIN_NAME):8080"
-        It "Resource Group [$testUrl] should return: [Hello world]" {
-            curl $testUrl | Should be "Hello world"
+        $testUrl = "http://$($env:DNS_DOMAIN_NAME)"
+        $allowedStatusCodes = @(200, 404, 503)
+        It "Resource Group [$testUrl] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
+            $responseStatusCode = curl -s -o /dev/null -w "%{http_code}" http://thehypepipe.co.uk
+            $responseStatusCode | Should BeIn $allowedStatusCodes
         }
     }
 }

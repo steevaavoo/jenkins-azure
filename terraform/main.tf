@@ -45,7 +45,7 @@ resource "azurerm_kubernetes_cluster" "stvaks" {
   }
 
   tags = {
-    Environment = "Production"
+    Environment = "dev"
   }
 }
 

@@ -4,17 +4,18 @@ FROM mcr.microsoft.com/powershell:6.2.3-centos-7
 ENV TERRAFORM_VERSION=0.12.20
 ENV DOCKER_VERSION=19.03.5
 ENV KUBECTL_VERSION=v1.17.3
+ENV HELM_VERSION=3.1.0
 
 # Metadata as defined at http://label-schema.org
 LABEL maintainer="Adam Rush" \
-      org.label-schema.schema-version="1.0" \
-      org.label-schema.name="Jenkins Agent with PowerShell" \
-      org.label-schema.license="MIT" \
-      org.label-schema.description="A Jenkins Agent with PowerShell, Azure, Terraform, Docker, and Kubernetes CLIs installed." \
-      org.label-schema.url="https://github.com/adamrushuk/jenkins-azure/blob/master/README.md" \
-      org.label-schema.usage="https://github.com/adamrushuk/jenkins-azure/blob/master/README.md" \
-      org.label-schema.vcs-url="https://github.com/adamrushuk/jenkins-azure" \
-      org.label-schema.docker.cmd="docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest pwsh"
+    org.label-schema.schema-version="1.0" \
+    org.label-schema.name="Jenkins Agent with PowerShell" \
+    org.label-schema.license="MIT" \
+    org.label-schema.description="A Jenkins Agent with PowerShell, Azure, Terraform, Docker, and Kubernetes CLIs installed." \
+    org.label-schema.url="https://github.com/adamrushuk/jenkins-azure/blob/master/README.md" \
+    org.label-schema.usage="https://github.com/adamrushuk/jenkins-azure/blob/master/README.md" \
+    org.label-schema.vcs-url="https://github.com/adamrushuk/jenkins-azure" \
+    org.label-schema.docker.cmd="docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest pwsh"
 
 # Install DockerCLI
 RUN docker_url=https://download.docker.com/linux/static/stable/x86_64 && \
@@ -37,6 +38,12 @@ RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform
     unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
     mv terraform /usr/local/bin && \
     rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
+# Install Helm
+RUN wget https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    tar -zxvf helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    mv linux-amd64/helm /usr/local/bin/helm && \
+    rm -f helm-v${HELM_VERSION}-linux-amd64.tar.gz
 
 # Install Azure CLI
 RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \

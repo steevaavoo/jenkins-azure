@@ -1,7 +1,7 @@
-Write-Host "Started in folder: [$(Get-Location)]"
-Write-Host "Changing directory to test folder..."
+Write-Output "Started in folder: [$(Get-Location)]"
+Write-Output "Changing directory to test folder..."
 Set-Location "test"
-Write-Host "STARTED: pwsh test tasks in current folder: [$(Get-Location)]"
+Write-Output "STARTED: pwsh test tasks in current folder: [$(Get-Location)]"
 
 # Debug
 if ($env:CI_DEBUG -eq "true") { Get-ChildItem env: | Select-Object "Name", "Value" }
@@ -20,4 +20,4 @@ catch {
     throw
 }
 
-Write-Host "FINISHED: pwsh test tasks"
+Write-Output "FINISHED: pwsh test tasks"
