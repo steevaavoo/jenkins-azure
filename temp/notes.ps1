@@ -105,6 +105,8 @@ docker container ls
 docker kill nodeapp
 #endregion Node App
 
+
+
 #region Kubectl
 
 # Downloading latest credentials for AKS Cluster
@@ -114,7 +116,7 @@ az aks get-credentials --resource-group aks-rg --name stvaks1 --overwrite-existi
 kubectl get node
 
 kubectl get ns
-kubectl get all, pv, pvc
+kubectl get all,pv,pvc
 
 # Custom Storage Class
 # Show default yaml
@@ -127,7 +129,7 @@ https://docs.microsoft.com/en-us/azure/aks/concepts-storage#storage-classes
 kubectl apply --validate -f ./manifests/azure-vote.yml
 
 # Check
-kubectl get sc, pvc, pv, all
+kubectl get sc,pvc,pv,all
 kubectl get events --sort-by=.metadata.creationTimestamp -w
 $podName = kubectl get pod -l app=azure-vote-front -o jsonpath="{.items[0].metadata.name}"
 $podName = kubectl get pod -l app=azure-vote-back -o jsonpath="{.items[0].metadata.name}"
@@ -137,8 +139,8 @@ kubectl top pod $podName
 # Wait for pod to be ready
 kubectl get pod $podName --watch
 kubectl get svc azure-vote-front --watch
-
 #endregion Kubectl
+
 
 
 #region Helm
@@ -175,10 +177,71 @@ kubectl get ingress -A
 helm list -A
 
 kubectl get all -n ingress-basic
+#endregion Helm
 
-# Cleanup
+
+
+#region Troubleshooting
+# Check HTTP status codes
+# Should return "200" if Default backend is running ok
+curl.exe -I -k http://thehypepipe.co.uk/healthz
+# Should return "200", maybe "404" if configured wrong
+curl.exe -I -k http://thehypepipe.co.uk
+curl.exe -I -k http://thehypepipe.co.uk
+curl.exe http://thehypepipe.co.uk
+curl.exe -I -k http://thehypepipe.co.uk/helloworld
+
+# ! COMMON ISSUES
+# - default-backend-service will show when ingress not configured correctly or it does not have endpoints
+# - ensure the ingress namespace matches the service namespaces
+
+# Check the Ingress Resource Events
+kubectl get ing -n ingress-basic
+kubectl get svc nginx-ingress-controller -n ingress-basic
+kubectl describe ing ingress -n ingress-basic
+kubectl describe pod nginx-ingress-controller-64c695bcf-2zhsq -n ingress-basic
+
+# Check the Ingress Controller Logs
+kubectl get pods -n ingress-basic
+kubectl logs -f -l component=controller --all-containers=true -n ingress-basic
+
+# Check the NginX Configuration
+# NginX vscode extension: https://marketplace.visualstudio.com/items?itemName=raynigon.nginx-formatter
+# Search nginx.conf for location {} blocks, including "$service_name" etc
+# Ensure $namespace, $ingress_name, $service_name, and $service_port are correct
+kubectl get pods -n ingress-basic
+kubectl exec -it -n ingress-basic nginx-ingress-controller-64c695bcf-6c755 cat /etc/nginx/nginx.conf > nginx.conf
+kubectl exec -it -n ingress-basic -l component=controller cat /etc/nginx/nginx.conf > nginx.conf
+
+# Check if used Services Exist
+kubectl get svc --all-namespaces
+
+# Check default backend pod
+kubectl describe pods -n ingress-basic -l component=default-backend
+
+# Debug Logging
+# Using the flag --v=XX it is possible to increase the level of logging. This is performed by editing the deployment
+kubectl get deploy -n ingress-basic
+kubectl edit deploy -n ingress-basic nginx-ingress-controller
+# Add --v=X to "- args", where X is an integer
+--v=2 shows details using diff about the changes in the configuration in nginx
+--v=3 shows details about the service, Ingress rule, endpoint changes and it dumps the nginx configuration in JSON format
+--v=5 configures NGINX in debug mode
+#endregion Troubleshooting
+
+
+#region Cleanup
+kubectl get ns
+kubectl get all,configmap,pv,pvc --namespace ingress-basic
+helm list --namespace ingress-basic
+
+kubectl delete namespace ingress-basic
+
 helm uninstall aks-helloworld --namespace ingress-basic
 helm uninstall aks-helloworld-two --namespace ingress-basic
 helm uninstall nginx-ingress --namespace ingress-basic
 
-#endregion Helm
+kubectl get ns
+kubectl get all --namespace ingress-basic
+helm list --namespace ingress-basic
+#endregion Cleanup
