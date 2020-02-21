@@ -108,7 +108,6 @@ docker kill nodeapp
 
 
 #region Kubectl
-
 # Downloading latest credentials for AKS Cluster
 az aks get-credentials --resource-group aks-rg --name stvaks1 --overwrite-existing
 
