@@ -10,7 +10,7 @@ az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER
 Write-Output "FINISHED: $message."
 
 # Create a namespace for your ingress resources
-kubectl create namespace ingress-basic
+kubectl create namespace ingress-tls
 
 
 
@@ -21,7 +21,7 @@ helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx-ingress stable/nginx-ingress `
-    --namespace ingress-basic `
+    --namespace ingress-tls `
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
     --set controller.extraArgs.v=3
@@ -35,10 +35,10 @@ helm install nginx-ingress stable/nginx-ingress `
 
 #region cert-manager
 # Install the CustomResourceDefinition resources separately
-kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml --namespace ingress-basic
+kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml --namespace ingress-tls
 
-# Label the ingress-basic namespace to disable resource validation
-kubectl label namespace ingress-basic certmanager.k8s.io/disable-validation=true
+# Label the ingress-tls namespace to disable resource validation
+kubectl label namespace ingress-tls certmanager.k8s.io/disable-validation=true
 
 # Add the Jetstack Helm repository
 helm repo add jetstack https://charts.jetstack.io
@@ -48,11 +48,11 @@ helm repo update
 
 # Install the cert-manager Helm chart
 helm install cert-manager `
-    --namespace ingress-basic `
+    --namespace ingress-tls `
     --version v0.12.0 jetstack/cert-manager `
     --set ingressShim.defaultIssuerName=letsencrypt `
     --set ingressShim.defaultIssuerKind=ClusterIssuer
 
 # Create a CA cluster issuer
-kubectl apply -f cluster-issuer.yml --namespace ingress-basic
+kubectl apply -f cluster-issuer.yml --namespace ingress-tls
 #endregion

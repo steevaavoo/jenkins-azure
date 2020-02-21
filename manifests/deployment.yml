@@ -2,7 +2,7 @@ apiVersion : apps/v1beta1
 kind: Deployment
 metadata:
   name: nodeapp
-  namespace: ingress-basic
+  namespace: ingress-tls
 spec:
   replicas: 2
   template:
