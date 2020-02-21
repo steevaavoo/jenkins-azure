@@ -111,6 +111,9 @@ docker kill nodeapp
 # Downloading latest credentials for AKS Cluster
 az aks get-credentials --resource-group aks-rg --name stvaks1 --overwrite-existing
 
+# View AKS Dashboard
+az aks browse --resource-group aks-rg --name stvaks1
+
 # See what's running
 kubectl get node
 
