@@ -176,9 +176,9 @@ helm install aks-helloworld-two azure-samples/aks-helloworld `
 
 kubectl apply -f ./manifests/ingress.yml
 kubectl get ingress -A
-helm list -A
+helm list
 
-kubectl get all
+kubectl get all,ing
 #endregion Helm
 
 
