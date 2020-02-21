@@ -26,8 +26,8 @@
 - [x] Add dynamic check to skip Docker build stage if image tag hasn't changed
 - [x] Fix ingress rules
 - [x] Add Helm for Kubernetes releases
-- [ ] Add TLS ingress to support HTTPS certs using LetsEncrypt service
-- [ ] Add AKS autoscaling (1-3 nodes)
+- [x] Add TLS ingress to support HTTPS certs using LetsEncrypt service
+- [x] Add AKS autoscaling (1-3 nodes)
 - [ ] Enable Kubernetes dashboard
 - [ ] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [ ] Add clock (or another better) example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
