@@ -14,7 +14,7 @@ pipeline {
 
   agent {
       docker {
-          image "${DOCKER_REPO}/psjenkinsagent:latest"
+          image "${DOCKER_REPO}/psjenkinsagent:2020-02-21"
           //label 'my-defined-label'
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
