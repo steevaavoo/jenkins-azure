@@ -84,13 +84,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
     max_count           = var.agent_pool_node_max_count
   }
 
-  linux_profile {
-    admin_username = var.admin_username
+  # linux_profile {
+  #   admin_username = var.admin_username
 
-    ssh_key {
-      key_data = file(var.public_ssh_key_path)
-    }
-  }
+  #   ssh_key {
+  #     key_data = file(var.public_ssh_key_path)
+  #   }
+  # }
 
   service_principal {
     client_id     = var.service_principal_client_id
