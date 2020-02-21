@@ -4,6 +4,22 @@ provider "azurerm" {
   version = "=1.41.0"
 }
 
+
+# Vars
+locals {
+  aks_cluster_name             = "${random_string.random.result}-aks"
+  log_analytics_workspace_name = "${var.azurerm_kubernetes_cluster_name}-workspace"
+}
+
+
+resource "random_string" "random" {
+  length  = 4
+  special = false
+  upper   = false
+  number  = false
+}
+
+
 # Deploying Terraform Remote State to AZ Storage Container
 terraform {
   required_version = ">= 0.12"
