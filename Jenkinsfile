@@ -8,8 +8,8 @@ pipeline {
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
     booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
     booleanParam name: 'FORCE_CONTAINER_BUILD', defaultValue: false, description: 'Forces ACR container build (true) or skips (false) when tag already exists.'
-    choice       name: 'DNS_DOMAIN_NAME', choices: ['bakers-foundry.co.uk', 'thehypepipe.co.uk'], description: 'Selecting between Steve\'s Domain Name and Adam\'s Domain Name for collaborative builds.'
-    choice       name: 'DOCKER_REPO',choices: ['steevaavoo', 'adamrushuk'], description: 'Selecting between Steve\'s Docker Repository and Adam\'s Docker Repository for collaborative builds.'
+    choice       name: 'DNS_DOMAIN_NAME', choices: ['thehypepipe.co.uk', 'bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
+    choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
   }
 
   agent {
