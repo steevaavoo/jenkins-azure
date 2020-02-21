@@ -24,7 +24,7 @@ param (
     $ApiSecret,
     $Ttl = 600,
     $ServiceLabel = 'app=nginx-ingress',
-    $NameSpace = 'ingress-basic'
+    $NameSpace = 'ingress-tls'
 )
 
 $ErrorActionPreference = "Stop"

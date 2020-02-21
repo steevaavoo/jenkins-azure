@@ -108,7 +108,6 @@ docker kill nodeapp
 
 
 #region Kubectl
-
 # Downloading latest credentials for AKS Cluster
 az aks get-credentials --resource-group aks-rg --name stvaks1 --overwrite-existing
 
@@ -145,11 +144,11 @@ kubectl get svc azure-vote-front --watch
 
 #region Helm
 # Create a namespace for your ingress resources
-kubectl create namespace ingress-basic
+kubectl create namespace ingress-tls
 
 # * IMPORTANT
 # permanently save the namespace for all subsequent kubectl commands in that context
-kubectl config set-context --current --namespace=ingress-basic
+kubectl config set-context --current --namespace=ingress-tls
 
 # Add the official stable repository
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
@@ -157,29 +156,29 @@ helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx-ingress stable/nginx-ingress `
-    --namespace ingress-basic `
+    --namespace ingress-tls `
     --set controller.replicaCount=2 `
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
 
-kubectl get service -l app=nginx-ingress --namespace ingress-basic
+kubectl get service -l app=nginx-ingress --namespace ingress-tls
 
 
 helm repo add azure-samples https://azure-samples.github.io/helm-charts/
 
-helm install aks-helloworld azure-samples/aks-helloworld --namespace ingress-basic
+helm install aks-helloworld azure-samples/aks-helloworld --namespace ingress-tls
 
 helm install aks-helloworld-two azure-samples/aks-helloworld `
-    --namespace ingress-basic `
+    --namespace ingress-tls `
     --set title="AKS Ingress Demo" `
     --set serviceName="aks-helloworld-two"
 
 
 kubectl apply -f ./manifests/ingress.yml
 kubectl get ingress -A
-helm list -A
+helm list
 
-kubectl get all
+kubectl get all,ing
 #endregion Helm
 
 
@@ -200,7 +199,7 @@ curl.exe -I -k http://thehypepipe.co.uk/helloworld
 
 # * IMPORTANT
 # permanently save the namespace for all subsequent kubectl commands in that context
-kubectl config set-context --current --namespace=ingress-basic
+kubectl config set-context --current --namespace=ingress-tls
 
 # Check the Ingress Resource Events
 $ingressControllerPodName = kubectl get pod -l component=controller -o jsonpath="{.items[0].metadata.name}"
@@ -246,16 +245,16 @@ kubectl edit deploy nginx-ingress-controller
 
 #region Cleanup
 kubectl get ns
-kubectl get all,configmap,pv,pvc --namespace ingress-basic
-helm list --namespace ingress-basic
+kubectl get all,configmap,pv,pvc --namespace ingress-tls
+helm list --namespace ingress-tls
 
-kubectl delete namespace ingress-basic
+kubectl delete namespace ingress-tls
 
-helm uninstall aks-helloworld --namespace ingress-basic
-helm uninstall aks-helloworld-two --namespace ingress-basic
-helm uninstall nginx-ingress --namespace ingress-basic
+helm uninstall aks-helloworld --namespace ingress-tls
+helm uninstall aks-helloworld-two --namespace ingress-tls
+helm uninstall nginx-ingress --namespace ingress-tls
 
 kubectl get ns
-kubectl get all --namespace ingress-basic
-helm list --namespace ingress-basic
+kubectl get all --namespace ingress-tls
+helm list --namespace ingress-tls
 #endregion Cleanup

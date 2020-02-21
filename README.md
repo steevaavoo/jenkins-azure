@@ -27,6 +27,8 @@
 - [x] Fix ingress rules
 - [x] Add Helm for Kubernetes releases
 - [ ] Add TLS ingress to support HTTPS certs using LetsEncrypt service
+- [ ] Add AKS autoscaling (1-3 nodes)
+- [ ] Enable Kubernetes dashboard
 - [ ] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [ ] Add clock (or another better) example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Add Terraform diff summary within input prompt (single line summary, or one line per resource)

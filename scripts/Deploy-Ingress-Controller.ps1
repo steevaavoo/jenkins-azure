@@ -5,20 +5,23 @@ $ErrorActionPreference = "Stop"
 
 # Setting k8s current context
 $message = "Merging AKS credentials"
-Write-Output "`nSTARTED: $message..."
+Write-Output "STARTED: $message..."
 az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
 Write-Output "FINISHED: $message."
 
 # Create a namespace for your ingress resources
-kubectl create namespace ingress-basic
+kubectl create namespace ingress-tls
 
+
+
+#region NGINX
 # Add the official stable repository
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx-ingress stable/nginx-ingress `
-    --namespace ingress-basic `
+    --namespace ingress-tls `
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
     --set controller.extraArgs.v=3
@@ -26,5 +29,30 @@ helm install nginx-ingress stable/nginx-ingress `
 # [OPTIONAL] args
 # --set controller.extraArgs.v=3 `
 # --set controller.replicaCount=2 `
+#endregion
 
-kubectl get service -l app=nginx-ingress --namespace ingress-basic
+
+
+#region cert-manager
+# Install the CustomResourceDefinition resources separately
+kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml --namespace ingress-tls
+
+# Label the ingress-tls namespace to disable resource validation
+kubectl label namespace ingress-tls certmanager.k8s.io/disable-validation=true
+
+# Add the Jetstack Helm repository
+helm repo add jetstack https://charts.jetstack.io
+
+# Update your local Helm chart repository cache
+helm repo update
+
+# Install the cert-manager Helm chart
+helm install cert-manager `
+    --namespace ingress-tls `
+    --version v0.12.0 jetstack/cert-manager `
+    --set ingressShim.defaultIssuerName=letsencrypt `
+    --set ingressShim.defaultIssuerKind=ClusterIssuer
+
+# Create a CA cluster issuer
+kubectl apply -f ./manifests/cluster-issuer.yml --namespace ingress-tls
+#endregion

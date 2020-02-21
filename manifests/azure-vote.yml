@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: azure-vote-back
-  namespace: ingress-basic
+  namespace: ingress-tls
 spec:
   replicas: 1
   selector:
