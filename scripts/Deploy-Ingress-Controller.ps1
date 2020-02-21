@@ -54,5 +54,5 @@ helm install cert-manager `
     --set ingressShim.defaultIssuerKind=ClusterIssuer
 
 # Create a CA cluster issuer
-kubectl apply -f cluster-issuer.yaml --namespace ingress-basic
+kubectl apply -f cluster-issuer.yml --namespace ingress-basic
 #endregion
