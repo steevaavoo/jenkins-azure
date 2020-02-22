@@ -3,7 +3,7 @@ pipeline {
   // triggers { pollSCM('* * * * *') } // Poll every minute
 
   parameters {
-    string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a prefix to ensure globally unique resource names', trim: true
+    string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a 4 character prefix to ensure globally unique resource names', trim: true
     choice       name: 'DNS_DOMAIN_NAME', choices: ['thehypepipe.co.uk', 'bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
     choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
