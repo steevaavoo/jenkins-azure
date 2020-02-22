@@ -84,7 +84,8 @@ pipeline {
           // bash: $TF_CHANGES_EXIST
           if (env.TF_CHANGES_EXIST == "True") {
 
-            tf_changes_summary=$(cat ./terraform/diff.txt | grep "Plan.*add.*change.*destroy" || "[NOT FOUND]")
+            // Get summary text
+            tf_changes_summary=$(cat './terraform/diff.txt' | grep "Plan.*add.*change.*destroy") || echo "[NOT FOUND]"
 
             //   "activity" param doesn't work as expected, so not currently using
             //   Use "activity: true" to timeout after inactivity
