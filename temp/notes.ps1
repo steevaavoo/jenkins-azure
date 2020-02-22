@@ -179,9 +179,13 @@ helm install aks-helloworld-two azure-samples/aks-helloworld `
 
 kubectl apply -f ./manifests/ingress.yml
 kubectl get ingress -A
-helm list
+helm list --all-namespaces
 
 kubectl get all,ing
+
+# Show secrets Helm uses to track release info
+# sls is like grep for PowerShell
+kubectl get secret | sls "NAME|helm.sh/release.v1"
 #endregion Helm
 
 
@@ -203,15 +207,18 @@ curl -h
 -v, --verbose       Make the operation more talkative
 
 # Should return "200" if Default backend is running ok
-curl -I -k https://thehypepipe.co.uk/healthz
+curl -I https://thehypepipe.co.uk/healthz
+
 # Should return "200", maybe "404" if configured wrong
-curl -I -k -L https://thehypepipe.co.uk
-curl -I https://thehypepipe.co.uk
-curl -I -k -L https://thehypepipe.co.uk
-curl https://thehypepipe.co.uk
 curl -I https://thehypepipe.co.uk/helloworld
-curl -I -k -L https://thehypepipe.co.uk/helloworld
-curl -I -k -L https://thehypepipe.co.uk/helloworld
+
+# Show HTML output
+curl https://thehypepipe.co.uk/helloworld
+curl https://thehypepipe.co.uk
+
+# Misc
+curl -I https://thehypepipe.co.uk/helloworld
+curl -I https://thehypepipe.co.uk
 
 # Check SSL
 # Use www.ssllabs.com for thorough SSL cert check
