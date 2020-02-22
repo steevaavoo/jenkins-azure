@@ -78,7 +78,7 @@ Describe "Integration Tests" {
         }
 
         It "A request to [$testUrlNodeApp] should include [$expectedContent] in the returned content" {
-            curl -k $testUrlNodeApp | Should be $expectedContent
+            curl -k -s $testUrlNodeApp | Should be $expectedContent
         }
     }
 }
