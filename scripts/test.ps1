@@ -1,3 +1,6 @@
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 Write-Output "Started in folder: [$(Get-Location)]"
 Write-Output "Changing directory to test folder..."
 Set-Location "test"

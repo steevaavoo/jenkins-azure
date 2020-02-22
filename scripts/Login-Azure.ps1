@@ -1,5 +1,8 @@
 # Login to Azure using Azure Service Principal env vars
 
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 # DEBUG: Output environment variables
 if ($env:CI_DEBUG -eq "true") { Get-ChildItem env: | Select-Object Name, Value }
 

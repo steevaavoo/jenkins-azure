@@ -1,3 +1,8 @@
+# Deploy kubernetes manifest files
+
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 # Replace tokens
 ./scripts/Replace-Tokens.ps1 -targetFilePattern './manifests/*.yml'
 

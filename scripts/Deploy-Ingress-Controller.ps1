@@ -62,7 +62,7 @@ helm repo update
 # Install the cert-manager Helm chart
 # https://hub.helm.sh/charts/jetstack/cert-manager
 helm install cert-manager jetstack/cert-manager `
-    --namespace cert-manager `
+    --namespace ingress-tls `
     --version v0.13.1 `
     --set ingressShim.defaultIssuerName=letsencrypt `
     --set ingressShim.defaultIssuerKind=ClusterIssuer
