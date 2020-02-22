@@ -1,7 +1,7 @@
 # Configure Providers
 provider "azurerm" {
   # Pin version as per best practice
-  version = "=1.41.0"
+  version = "=1.44.0"
 }
 
 
