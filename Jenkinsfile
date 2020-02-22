@@ -36,7 +36,7 @@ pipeline {
     // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
     LOCATION = 'uksouth'
     //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
-    TERRAFORM_STORAGE_ACCOUNT = "${PREFIX}sttfstate001${LOCATION}001"
+    TERRAFORM_STORAGE_ACCOUNT = "${PREFIX}sttfstate${LOCATION}001"
     TERRAFORM_STORAGE_RG = "${PREFIX}-rg-tfstate-dev-001"
   }
 
