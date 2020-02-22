@@ -207,18 +207,18 @@ curl -h
 -v, --verbose       Make the operation more talkative
 
 # Should return "200" if Default backend is running ok
-curl -I https://aks.thehypepipe.co.uk/healthz
+curl -I https://thehypepipe.co.uk/healthz
 
 # Should return "200", maybe "404" if configured wrong
-curl -I https://aks.thehypepipe.co.uk/helloworld
+curl -I https://thehypepipe.co.uk/helloworld
 
 # Show HTML output
-curl https://aks.thehypepipe.co.uk/helloworld
-curl https://aks.thehypepipe.co.uk
+curl https://thehypepipe.co.uk/helloworld
+curl https://thehypepipe.co.uk
 
 # Misc
-curl -I https://aks.thehypepipe.co.uk/helloworld
-curl -I https://aks.thehypepipe.co.uk
+curl -I https://thehypepipe.co.uk/helloworld
+curl -I https://thehypepipe.co.uk
 
 # Check SSL
 # Use www.ssllabs.com for thorough SSL cert check
