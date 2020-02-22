@@ -35,9 +35,13 @@
 - [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [x] Add Terraform diff summary within input prompt (single line summary)
 - [x] Add Terraform diff summary details within input prompt (one line per resource)
-- [ ] Add Velero backup
 - [ ] Add clock (or another better) example node app instead of a one sentence website:  
   https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
+- [ ] Add a StatefulSet app example (research below):  
+  - https://velero.io/blog/velero-v1-1-stateful-backup-vsphere/
+  - https://github.com/helm/charts/tree/master/stable/wordpress
+  - https://aksworkshop.io/
+- [ ] Add Velero backup (after adding StatefulSet example)
 - [ ] Complete this README with proper usage instructions
 
 ```powershell

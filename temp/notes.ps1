@@ -283,6 +283,7 @@ kubectl edit deploy nginx-ingress-controller
 #endregion Troubleshooting
 
 
+
 #region Cleanup
 kubectl get ns
 kubectl get all,configmap,pv,pvc --namespace ingress-tls
