@@ -1,20 +1,42 @@
-# Vars
-variable "azure_resourcegroup_name" {
-  default = "__AKS_RG_NAME__"
-}
-
+# Common
 variable "location" {
   default = "uksouth"
 }
 
+variable "azure_resourcegroup_name" {
+  default = "__AKS_RG_NAME__"
+}
+
+variable "log_analytics_workspace_name" {
+  default = "__PREFIX__-la-workspace-001"
+}
+
 variable "admin_username" {
-  description = "The admin username of the VM(s) that will be deployed"
+  description = "The admin username of the VMs that will be deployed"
   default     = "sysadmin"
 }
 
-variable "public_ssh_key_path" {
-  description = "Public key path for ssh access to the VM"
-  default     = "~/.ssh/id_rsa.pub"
+
+# Use "cat ~/.ssh/id_rsa.pub"
+variable "ssh_public_key" {
+  description = "Public key for SSH access to the VMs"
+  default     = ""
+}
+
+# [NOT USED] Use "cat ~/.ssh/id_rsa"
+# variable "ssh_private_key" {
+#   description = "Private key for SSH access to the VMs"
+#   default     = ""
+# }
+
+variable "tags" {
+  description = "A map of the tags to use on the resources"
+
+  default = {
+    Env    = "Dev"
+    Owner  = "Adam Rush"
+    Source = "terraform"
+  }
 }
 
 
@@ -86,16 +108,4 @@ variable "agent_pool_profile_os_type" {
 
 variable "agent_pool_profile_disk_size_gb" {
   default = 30
-}
-
-
-# Misc
-variable "tags" {
-  description = "A map of the tags to use on the resources"
-
-  default = {
-    Environment = "Dev"
-    Owner       = "Adam Rush"
-    Source      = "terraform"
-  }
 }

@@ -1,34 +1,7 @@
-# Configure Providers
-provider "azurerm" {
-  # Pin version as per best practice
-  version = "=1.44.0"
-}
-
-
-# Vars
-locals {
-  aks_cluster_name             = "${random_string.random.result}-aks"
-  log_analytics_workspace_name = "${var.azurerm_kubernetes_cluster_name}-workspace"
-}
-
-
-resource "random_string" "random" {
-  length  = 4
-  special = false
-  upper   = false
-  number  = false
-}
-
-
-# Deploying Terraform Remote State to AZ Storage Container
-terraform {
-  required_version = ">= 0.12"
-  backend "azurerm" {
-    storage_account_name = "__TERRAFORM_STORAGE_ACCOUNT__"
-    container_name       = "terraform"
-    key                  = "terraform.tfstate"
-    access_key           = "__STORAGE_KEY__"
-  }
+# Common
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "azurerm_resource_group" "aks" {
@@ -36,6 +9,8 @@ resource "azurerm_resource_group" "aks" {
   location = var.location
 }
 
+
+# ACR
 resource "azurerm_container_registry" "aks" {
   name                = var.container_registry_name
   resource_group_name = azurerm_resource_group.aks.name
@@ -47,8 +22,8 @@ resource "azurerm_container_registry" "aks" {
 
 # Log Analytics
 resource "azurerm_log_analytics_workspace" "aks" {
-  # The WorkSpace name has to be unique across the whole of azure, not just the current subscription/tenant
-  name                = local.log_analytics_workspace_name
+  # The Workspace name is globally unique
+  name                = var.log_analytics_workspace_name
   location            = azurerm_resource_group.aks.location
   resource_group_name = azurerm_resource_group.aks.name
   sku                 = "PerGB2018"
@@ -84,13 +59,18 @@ resource "azurerm_kubernetes_cluster" "aks" {
     max_count           = var.agent_pool_node_max_count
   }
 
-  # linux_profile {
-  #   admin_username = var.admin_username
+  linux_profile {
+    admin_username = var.admin_username
 
-  #   ssh_key {
-  #     key_data = file(var.public_ssh_key_path)
-  #   }
-  # }
+    ssh_key {
+      key_data = chomp(
+        coalesce(
+          var.ssh_public_key,
+          tls_private_key.ssh.public_key_openssh,
+        )
+      )
+    }
+  }
 
   service_principal {
     client_id     = var.service_principal_client_id
@@ -118,11 +98,3 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ]
   }
 }
-
-# output "client_certificate" {
-#   value = azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate
-# }
-
-# output "kube_config" {
-#   value = azurerm_kubernetes_cluster.aks.kube_config_raw
-# }
