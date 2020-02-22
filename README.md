@@ -29,13 +29,15 @@
 - [x] Add TLS ingress to support HTTPS certs using LetsEncrypt service
 - [x] Add AKS autoscaling (1-3 nodes)
 - [x] Enable Kubernetes dashboard
-- [x] Ensure all resource names adhere to Azure naming conventions: https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging
+- [x] Ensure all resource names adhere to Azure naming conventions:  
+  https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging
 - [x] Add SSH key creation and outputs
 - [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [x] Add Terraform diff summary within input prompt (single line summary)
 - [x] Add Terraform diff summary details within input prompt (one line per resource)
 - [ ] Add Velero backup
-- [ ] Add clock (or another better) example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
+- [ ] Add clock (or another better) example node app instead of a one sentence website:  
+  https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Complete this README with proper usage instructions
 
 ```powershell
