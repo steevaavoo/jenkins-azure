@@ -109,7 +109,10 @@ docker kill nodeapp
 
 #region Kubectl
 # Downloading latest credentials for AKS Cluster
-az aks get-credentials --resource-group aks-rg --name stvaks1 --overwrite-existing
+az aks get-credentials --resource-group ruba-rg-aks-dev-001 --name ruba-aks-001 --overwrite-existing
+
+# View AKS Dashboard
+az aks browse --resource-group ruba-rg-aks-dev-001 --name ruba-aks-001
 
 # See what's running
 kubectl get node
@@ -176,22 +179,56 @@ helm install aks-helloworld-two azure-samples/aks-helloworld `
 
 kubectl apply -f ./manifests/ingress.yml
 kubectl get ingress -A
-helm list
+helm list --all-namespaces
 
 kubectl get all,ing
+
+# Show secrets Helm uses to track release info
+# sls is like grep for PowerShell
+kubectl get secret | sls "NAME|helm.sh/release.v1"
 #endregion Helm
 
 
 
 #region Troubleshooting
 # Check HTTP status codes
+# Install cURL
+choco install -y curl
+
+# Show all curl options/switches
+curl -h
+
+# Common options
+-I, --head          Show document info only
+-i, --include       Include protocol response headers in the output
+-k, --insecure      Allow insecure server connections when using SSL
+-L, --location      Follow redirects
+-s, --silent        Silent mode
+-v, --verbose       Make the operation more talkative
+
 # Should return "200" if Default backend is running ok
-curl.exe -I -k http://thehypepipe.co.uk/healthz
+curl -I https://thehypepipe.co.uk/healthz
+
 # Should return "200", maybe "404" if configured wrong
-curl.exe -I -k http://thehypepipe.co.uk
-curl.exe -I -k http://thehypepipe.co.uk
-curl.exe http://thehypepipe.co.uk
-curl.exe -I -k http://thehypepipe.co.uk/helloworld
+curl -I https://thehypepipe.co.uk/helloworld
+
+# Show HTML output
+curl https://thehypepipe.co.uk/helloworld
+curl https://thehypepipe.co.uk
+
+# Misc
+curl -I https://thehypepipe.co.uk/helloworld
+curl -I https://thehypepipe.co.uk
+
+# Check SSL
+# Use www.ssllabs.com for thorough SSL cert check
+https://www.ssllabs.com/ssltest/analyze.html?d=thehypepipe.co.uk
+
+# openssl s_client -connect host:port -status
+# openssl s_client -connect host:port -status [-showcerts]
+openssl s_client -connect thehypepipe.co.uk:443 -status -showcerts
+openssl s_client -connect thehypepipe.co.uk:443 -status
+openssl s_client -connect thehypepipe.co.uk:443
 
 # ! COMMON ISSUES
 # - default-backend-service will show when ingress not configured correctly or it does not have endpoints
@@ -229,13 +266,16 @@ kubectl get svc --all-namespaces
 # Check default backend pod
 kubectl describe pods -l component=default-backend
 
+
 # Debug Logging
 # Using the flag --v=XX it is possible to increase the level of logging.
 # This is performed by editing the deployment
 kubectl get deploy
+
 # Instruct kubectl to edit using vscode
 $env:KUBE_EDITOR = 'code --wait'
 kubectl edit deploy nginx-ingress-controller
+
 # Add --v=X to "- args", where X is an integer
 --v=2 shows details using diff about the changes in the configuration in nginx
 --v=3 shows details about the service, Ingress rule, endpoint changes and it dumps the nginx configuration in JSON format

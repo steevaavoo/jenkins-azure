@@ -1,3 +1,9 @@
+# Build container image
+# Uploads files to ACR and builds in Azure
+
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 Push-Location .\app
 
 # Logging in to container registry

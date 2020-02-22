@@ -1,10 +1,10 @@
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 Write-Output "Started in folder: [$(Get-Location)]"
 Write-Output "Changing directory to test folder..."
 Set-Location "test"
 Write-Output "STARTED: pwsh test tasks in current folder: [$(Get-Location)]"
-
-# Debug
-if ($env:CI_DEBUG -eq "true") { Get-ChildItem env: | Select-Object "Name", "Value" }
 
 # Tests
 $taskMessage = "Running Pester tests"

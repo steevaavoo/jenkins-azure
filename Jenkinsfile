@@ -3,29 +3,32 @@ pipeline {
   // triggers { pollSCM('* * * * *') } // Poll every minute
 
   parameters {
-    booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
-    booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
-    booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
-    booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
-    booleanParam name: 'FORCE_CONTAINER_BUILD', defaultValue: false, description: 'Forces ACR container build (true) or skips (false) when tag already exists.'
+    string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a 4 character prefix to ensure globally unique resource names', trim: true
     choice       name: 'DNS_DOMAIN_NAME', choices: ['thehypepipe.co.uk', 'bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
     choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
+    booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
+    booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
+    booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
+    booleanParam name: 'FORCE_CONTAINER_BUILD', defaultValue: false, description: 'Forces ACR container build (true) or skips (false) when tag already exists.'
+    booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
   }
 
   agent {
       docker {
           image "${DOCKER_REPO}/psjenkinsagent:2020-02-21"
-          //label 'my-defined-label'
+          // label 'jenkins-agent' // use a label to target pre-configured agents
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
   }
 
+  // Ensure Azure naming conventions are used, with globally unique names as required
+  // source: https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#sample-naming-convention
   environment {
     ACR_FQDN = "${ACR_NAME}.azurecr.io"
-    ACR_NAME = 'stvcontreg1'
-    AKS_CLUSTER_NAME = 'stvaks1'
+    ACR_NAME = "${PREFIX}acr001${LOCATION}001" // alpha numeric characters only
+    AKS_CLUSTER_NAME = "${PREFIX}-aks-001"
     AKS_IMAGE = "${ACR_FQDN}/${CONTAINER_IMAGE_TAG_FULL}"
-    AKS_RG_NAME = 'aks-rg'
+    AKS_RG_NAME = "${PREFIX}-rg-aks-dev-001"
     CLIENTID = 'http://tfm-k8s-spn'
     CONTAINER_IMAGE_NAME = 'nodeapp'
     CONTAINER_IMAGE_TAG = '2020-02-19'
@@ -33,8 +36,8 @@ pipeline {
     // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
     LOCATION = 'uksouth'
     //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
-    TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
-    TERRAFORM_STORAGE_RG = 'terraform-rg'
+    TERRAFORM_STORAGE_ACCOUNT = "${PREFIX}sttfstate${LOCATION}001"
+    TERRAFORM_STORAGE_RG = "${PREFIX}-rg-tfstate-dev-001"
   }
 
   options {

@@ -1,3 +1,6 @@
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 # Change into TF folder location
 Push-Location -Path .\terraform
 

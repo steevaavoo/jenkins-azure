@@ -1,4 +1,8 @@
 # Terraform tasks
+
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 terraform version
 
 # Change into TF folder location

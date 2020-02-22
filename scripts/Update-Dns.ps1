@@ -27,6 +27,7 @@ param (
     $NameSpace = 'ingress-tls'
 )
 
+# Ensure any errors fail the build
 $ErrorActionPreference = "Stop"
 
 # Setting k8s current context
