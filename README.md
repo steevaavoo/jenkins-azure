@@ -35,6 +35,7 @@
 - [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [x] Add Terraform diff summary within input prompt (single line summary)
 - [x] Add Terraform diff summary details within input prompt (one line per resource)
+- [ ] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
 - [ ] Add clock (or another better) example node app instead of a one sentence website:  
   https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Add a StatefulSet app example (research below):  
