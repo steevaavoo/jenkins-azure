@@ -16,7 +16,7 @@ pipeline {
   agent {
       docker {
           image "${DOCKER_REPO}/psjenkinsagent:2020-02-21"
-          label 'jenkins-agent'
+          // label 'jenkins-agent' // use a label to target pre-configured agents
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
   }
