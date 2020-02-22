@@ -85,11 +85,11 @@ pipeline {
           if (env.TF_CHANGES_EXIST == "True") {
 
             // Get summary text
-            tf_changes_summary=$(cat './terraform/diff.txt' | grep "Plan.*add.*change.*destroy") || echo "[NOT FOUND]"
+            tf_changes_summary=pwsh(script: './scripts/Get-TFPlanSummary.ps1', returnStdout: true).trim()
 
-            //   "activity" param doesn't work as expected, so not currently using
-            //   Use "activity: true" to timeout after inactivity
-            //   Use "activity: false" to continue after inactivity
+            //  "activity" param doesn't work as expected, so not currently using
+            //  Use "activity: true" to timeout after inactivity
+            //  Use "activity: false" to continue after inactivity
             timeout(activity: false, time: 5) {
               input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
             }
