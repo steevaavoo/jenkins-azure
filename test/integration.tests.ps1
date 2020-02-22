@@ -58,11 +58,19 @@ Describe "Integration Tests" {
     # DNS record updated
     Context "When DNS record has been updated for: [$env:DNS_DOMAIN_NAME]" {
 
-        $testUrl = "http://$($env:DNS_DOMAIN_NAME)"
-        $allowedStatusCodes = @(200, 404, 503)
-        It "Resource Group [$testUrl] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
-            $responseStatusCode = curl -s -o /dev/null -w "%{http_code}" http://thehypepipe.co.uk
+        # Vars
+        $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
+        $testUrlNodeApp = "$($testUrl)/helloworld"
+        $allowedStatusCodes = @(200, 304, 404, 503)
+        $expectedContent = "Hello world"
+
+        It "A request to [$testUrl] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
+            $responseStatusCode = curl -s -o /dev/null -w "%{http_code}" $testUrl
             $responseStatusCode | Should BeIn $allowedStatusCodes
+        }
+
+        It "A request to [$testUrlNodeApp] should include [$expectedContent] in the returned content" {
+            curl $testUrlNodeApp | Should be $expectedContent
         }
     }
 }

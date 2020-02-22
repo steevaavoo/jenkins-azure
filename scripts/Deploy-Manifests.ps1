@@ -23,5 +23,5 @@ kubectl apply -f ./manifests -n ingress-tls
 Write-Output "FINISHED: $message."
 
 # Show ingress URL
-$url = kubectl get svc nginx-ingress-controller -n ingress-tls --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
+$url = kubectl get svc nginx-ingress-controller -n ingress-tls --ignore-not-found -o jsonpath="https://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
 Write-Output "Browse to ingress URL: [$url]"
