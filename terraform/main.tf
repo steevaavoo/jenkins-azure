@@ -7,6 +7,7 @@ resource "tls_private_key" "ssh" {
 resource "azurerm_resource_group" "aks" {
   name     = var.azure_resourcegroup_name
   location = var.location
+  tags     = var.tags
 }
 
 
@@ -17,6 +18,7 @@ resource "azurerm_container_registry" "aks" {
   location            = azurerm_resource_group.aks.location
   admin_enabled       = var.acr_admin_enabled
   sku                 = var.acr_sku
+  tags                = var.tags
 }
 
 
@@ -27,6 +29,7 @@ resource "azurerm_log_analytics_workspace" "aks" {
   location            = azurerm_resource_group.aks.location
   resource_group_name = azurerm_resource_group.aks.name
   sku                 = "PerGB2018"
+  tags                = var.tags
 }
 
 resource "azurerm_log_analytics_solution" "aks" {
