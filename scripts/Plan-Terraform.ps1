@@ -10,7 +10,7 @@ Write-Output "STARTED: $message..."
 terraform plan -out=tfplan
 Write-Output "FINISHED: $message."
 
-Write-Output "Terraform Plan - Generated on: $(date)\n" > diff.txt
+Write-Output "Terraform Plan - Generated on: $(Get-Date)`n" > diff.txt
 terraform show -no-color tfplan | Tee-Object -FilePath diff.txt
 
 # Revert to previous folder location

@@ -62,7 +62,7 @@ pipeline {
       }
     }
 
-    stage('Build') {
+    stage('Terraform') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       options {
         // Timeout for whole Stage
@@ -84,12 +84,16 @@ pipeline {
           // bash: $TF_CHANGES_EXIST
           if (env.TF_CHANGES_EXIST == "True") {
 
+            tf_changes_summary=$(
+              cat ./terraform/diff.txt | grep "Plan.*add.*change.*destroy"
+
+            )
+
             //   "activity" param doesn't work as expected, so not currently using
             //   Use "activity: true" to timeout after inactivity
             //   Use "activity: false" to continue after inactivity
             timeout(activity: false, time: 5) {
-              // TODO: Add TF diff summmary to input prompt?
-              input 'Changes found in TF plan. Continue Terraform Apply?'
+              input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
             }
 
             pwsh(script: './scripts/Apply-Terraform.ps1')
@@ -101,7 +105,7 @@ pipeline {
       }
     }
 
-    stage('Docker') {
+    stage('Build-Docker') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: './scripts/Build-DockerImage.ps1')

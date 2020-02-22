@@ -32,9 +32,9 @@
 - [x] Ensure all resource names adhere to Azure naming conventions: https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging
 - [x] Add SSH key creation and outputs
 - [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
+- [ ] Add Terraform diff summary within input prompt (single line summary, or one line per resource)
 - [ ] Add Velero backup
 - [ ] Add clock (or another better) example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
-- [ ] Add Terraform diff summary within input prompt (single line summary, or one line per resource)
 - [ ] Complete this README with proper usage instructions
 
 ```powershell
