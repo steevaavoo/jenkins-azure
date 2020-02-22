@@ -26,6 +26,18 @@ $message = "Checking for Terraform planned changes"
 Write-Verbose "STARTED: $message..."
 if ($output = Get-Content $TFDiffFilename | Select-String "Plan:.*add.*change.*destroy") {
     $output
+
+    <#
+    # Regex testing: https://regex101.com/
+
+    EXPLANATION: ^\s*\+
+    ^ asserts position at start of a line
+    \s* matches any whitespace character (equal to [\r\n\t\f\v ])
+    * Quantifier - Matches between zero and unlimited times, as many times as possible, giving back as needed (greedy)
+    \+ matches the character + literally (case sensitive)
+    #>
+    (Get-Content $TFDiffFilename) | Select-String "^\s*~", "^\s*\+", "^\s*-"
+
 } else {
     "[NOT FOUND]"
 }
