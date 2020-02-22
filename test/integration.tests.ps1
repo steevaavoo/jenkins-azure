@@ -60,17 +60,25 @@ Describe "Integration Tests" {
 
         # Vars
         $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
+        $testUrl = "https://thehypepipe.co.uk"
         $testUrlNodeApp = "$($testUrl)/helloworld"
         $allowedStatusCodes = @(200, 304, 404, 503)
         $expectedContent = "Hello world"
 
+        # Root domain
         It "A request to [$testUrl] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
-            $responseStatusCode = curl -s -o /dev/null -w "%{http_code}" $testUrl
+            $responseStatusCode = curl -k -s -o /dev/null -w "%{http_code}" $testUrl
+            $responseStatusCode | Should BeIn $allowedStatusCodes
+        }
+
+        # nodeapp
+        It "A request to [$testUrlNodeApp] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
+            $responseStatusCode = curl -k -s -o /dev/null -w "%{http_code}" $testUrl
             $responseStatusCode | Should BeIn $allowedStatusCodes
         }
 
         It "A request to [$testUrlNodeApp] should include [$expectedContent] in the returned content" {
-            curl $testUrlNodeApp | Should be $expectedContent
+            curl -k $testUrlNodeApp | Should be $expectedContent
         }
     }
 }

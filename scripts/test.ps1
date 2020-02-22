@@ -8,15 +8,15 @@ Write-Output "STARTED: pwsh test tasks in current folder: [$(Get-Location)]"
 
 # Tests
 $taskMessage = "Running Pester tests"
-Write-Output -Message "STARTED: $taskMessage..."
+Write-Output "STARTED: $taskMessage..."
 try {
     $testScripts = Get-ChildItem -Path "*.tests.ps1"
     Invoke-Pester -Script $testScripts -PassThru -OutputFormat "JUnitXml" -OutputFile "pester-test-results-junit.xml" -Verbose -ErrorAction "Stop"
 
-    Write-Output -Message "FINISHED: $taskMessage."
+    Write-Output "FINISHED: $taskMessage."
 }
 catch {
-    Write-Error -Message "ERROR: $taskMessage." -ErrorAction "Continue"
+    Write-Error "ERROR: $taskMessage." -ErrorAction "Continue"
     throw
 }
 
