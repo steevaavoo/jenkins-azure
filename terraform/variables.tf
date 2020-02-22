@@ -79,7 +79,7 @@ variable "service_principal_client_secret" {
 
 # Agent Pool
 variable "agent_pool_node_count" {
-  default = 1
+  default = 2
 }
 
 variable "agent_pool_enable_auto_scaling" {
