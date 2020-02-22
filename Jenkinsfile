@@ -25,7 +25,7 @@ pipeline {
   // source: https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#sample-naming-convention
   environment {
     ACR_FQDN = "${ACR_NAME}.azurecr.io"
-    ACR_NAME = "${PREFIX}-acr-001"
+    ACR_NAME = "${PREFIX}acr001${LOCATION}001" // alpha numeric characters only
     AKS_CLUSTER_NAME = "${PREFIX}-aks-001"
     AKS_IMAGE = "${ACR_FQDN}/${CONTAINER_IMAGE_TAG_FULL}"
     AKS_RG_NAME = "${PREFIX}-rg-aks-dev-001"
