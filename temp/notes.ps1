@@ -114,11 +114,16 @@ az aks get-credentials --resource-group ruba-rg-aks-dev-001 --name ruba-aks-001 
 # View AKS Dashboard
 az aks browse --resource-group ruba-rg-aks-dev-001 --name ruba-aks-001
 
+# * IMPORTANT
+# permanently save the namespace for all subsequent kubectl commands in that context
+kubectl config set-context --current --namespace=ingress-tls
+
 # See what's running
 kubectl get node
-
 kubectl get ns
+kubectl get svc,ingress
 kubectl get all,pv,pvc
+kubectl get all,pv,pvc -o wide
 
 # Custom Storage Class
 # Show default yaml
@@ -181,6 +186,8 @@ kubectl apply -f ./manifests/ingress.yml
 kubectl get ingress -A
 helm list --all-namespaces
 
+helm status cert-manager
+
 kubectl get all,ing
 
 # Show secrets Helm uses to track release info
@@ -219,6 +226,9 @@ curl https://thehypepipe.co.uk
 # Misc
 curl -I https://thehypepipe.co.uk/helloworld
 curl -I https://thehypepipe.co.uk
+# Ignore cert errors
+curl -i -k https://thehypepipe.co.uk/helloworld
+curl -i -k https://thehypepipe.co.uk
 
 # Check SSL
 # Use www.ssllabs.com for thorough SSL cert check
@@ -226,9 +236,9 @@ https://www.ssllabs.com/ssltest/analyze.html?d=thehypepipe.co.uk
 
 # openssl s_client -connect host:port -status
 # openssl s_client -connect host:port -status [-showcerts]
+openssl s_client -connect thehypepipe.co.uk:443 | sls "CN =|error"
 openssl s_client -connect thehypepipe.co.uk:443 -status -showcerts
 openssl s_client -connect thehypepipe.co.uk:443 -status
-openssl s_client -connect thehypepipe.co.uk:443
 
 # ! COMMON ISSUES
 # - default-backend-service will show when ingress not configured correctly or it does not have endpoints
@@ -241,12 +251,13 @@ kubectl config set-context --current --namespace=ingress-tls
 # Check the Ingress Resource Events
 $ingressControllerPodName = kubectl get pod -l component=controller -o jsonpath="{.items[0].metadata.name}"
 kubectl get ing
+kubectl get ing ingress -o yaml
 kubectl describe ing ingress
+kubectl describe ing ingress-static
 kubectl get svc nginx-ingress-controller
 kubectl describe pod $ingressControllerPodName
 
 # Check the Ingress Controller Logs
-kubectl get pods
 kubectl logs -f -l component=controller --all-containers=true
 
 # Check the NginX Configuration
@@ -280,6 +291,94 @@ kubectl edit deploy nginx-ingress-controller
 --v=2 shows details using diff about the changes in the configuration in nginx
 --v=3 shows details about the service, Ingress rule, endpoint changes and it dumps the nginx configuration in JSON format
 --v=5 configures NGINX in debug mode
+
+
+
+# Debugging cert-manager
+# Show all resource types
+kubectl api-resources
+kubectl api-resources | sls "cert-manager.io"
+
+# Show cert-manager resources
+kubectl get challenges,orders,certificaterequests,certificates,clusterissuers,issuers -A
+kubectl get challenges -A -o wide
+kubectl get orders -A -o wide
+kubectl get certificaterequests -A -o wide
+kubectl get certificates -A -o wide
+kubectl get clusterissuers -A -o wide
+kubectl get issuers -A -o wide
+
+# Check Custom Resource Definitions
+kubectl get crd
+
+# Show cert-manager pods
+kubectl get pods -l app.kubernetes.io/instance=cert-manager -o wide
+
+# Check pod status and events
+$certManagerPod = kubectl get pod -l app.kubernetes.io/name=cert-manager -o jsonpath="{.items[0].metadata.name}"
+$caInjectorPod = kubectl get pod -l app.kubernetes.io/name=cainjector -o jsonpath="{.items[0].metadata.name}"
+$webhookPod = kubectl get pod -l app.kubernetes.io/name=webhook -o jsonpath="{.items[0].metadata.name}"
+kubectl describe pods $certManagerPod
+kubectl describe pods $caInjectorPod
+kubectl describe pods $webhookPod
+
+# Check pod status and events
+# kubectl logs -f -l LABEL=VALUE --all-containers=true
+kubectl logs -f $certManagerPod --all-containers=true
+kubectl logs -f $caInjectorPod --all-containers=true
+kubectl logs -f $webhookPod --all-containers=true
+
+# Check DNS from within pods
+kubectl exec -it $certManagerPod cert-manager sh
+kubectl exec -it $caInjectorPod sh
+kubectl exec -it $webhookPod sh
+# Check dns lookup
+nslookup thehypepipe.co.uk
+
+# TODO WIP
+# Main issue in initial Jenkins build when running:
+# "kubectl apply -f ./manifests/cluster-issuer.yml --namespace ingress-tls"
+[2020-02-22T12:58:13.628Z] Error from server (InternalError): error when creating "./manifests/cluster-issuer.yml": Internal error occurred: failed calling webhook "webhook.cert-manager.io": Post https://cert-manager-webhook.ingress-tls.svc:443/mutate?timeout=30s: dial tcp 10.0.171.89:443: connect: connection refused
+
+# Works second attempt
+clusterissuer.cert-manager.io/letsencrypt configured
+
+# Check cert issuer
+kubectl get ClusterIssuer -A
+kubectl get Issuer -A
+
+kubectl get customresourcedefinitions
+kubectl get crd
+kubectl get clusterissuers.cert-manager.io -A
+kubectl get issuers.cert-manager.io -A
+
+# Check webhook api
+kubectl get apiservice v1beta1.webhook.certmanager.k8s.io
+kubectl get apiservice | sls "webhook"
+
+
+# Check ClusterIssuer
+kubectl get ClusterIssuer -A -o wide
+kubectl describe ClusterIssuer letsencrypt
+
+# Check Certificate
+kubectl get cert -A -o wide
+kubectl describe cert tls-secret
+kubectl get cert tls-secret --watch
+kubectl delete cert tls-secret
+
+# Check Secret
+kubectl get secret -A
+kubectl describe secret tls-secret
+kubectl describe secret letsencrypt
+
+
+# Recreate ingress
+kubectl delete -f ./manifests/ingress.yml
+kubectl apply -f ./manifests/ingress.yml
+
+kubectl get ing -o wide
+kubectl describe ingress
 #endregion Troubleshooting
 
 
