@@ -13,7 +13,7 @@ kubectl apply -f ./manifests/namespace.yml
 Write-Output "FINISHED: $message.`n"
 
 
-#region NGINX
+#region NGINX Ingress
 $message = "[HELM] Installing NGINX ingress controller"
 Write-Output "STARTED: $message..."
 
@@ -47,7 +47,9 @@ helm upgrade `
 # --set controller.extraArgs.v=3 `
 # --set controller.replicaCount=2 `
 
+# Check nginx-ingress resources
 helm list --all-namespaces
+kubectl get all -n ingress-tls -l app=nginx-ingress
 
 Write-Output "FINISHED: $message."
 #endregion
