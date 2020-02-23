@@ -9,7 +9,7 @@ Write-Output "FINISHED: $message.`n"
 # Create a namespace for your ingress resources
 $message = "Creating namespace"
 Write-Output "STARTED: $message..."
-kubectl create namespace ingress-tls
+kubectl apply -f ./manifests/namespace.yml
 Write-Output "FINISHED: $message.`n"
 
 
@@ -21,8 +21,23 @@ Write-Output "STARTED: $message..."
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo update
 
+
+# TODO add idempotent check before helm install (helm upgrade increments release, even with same values as previous release)
+# $helmList = helm list -n ingress-tls -o json | ConvertFrom-Json
+# $helmList | Where-Object Name -eq "nginx-ingress"
+
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx-ingress stable/nginx-ingress `
+# helm install nginx-ingress stable/nginx-ingress `
+#     --namespace ingress-tls `
+#     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
+#     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
+#     --set controller.extraArgs.v=3
+
+# helm upgrade [RELEASE] [CHART] [flags]
+# helm upgrade something ./path/to/my/chart -f my-values.yaml --install --atomic
+helm upgrade `
+    nginx-ingress stable/nginx-ingress `
+    --install --atomic `
     --namespace ingress-tls `
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
@@ -31,6 +46,8 @@ helm install nginx-ingress stable/nginx-ingress `
 # [OPTIONAL] args
 # --set controller.extraArgs.v=3 `
 # --set controller.replicaCount=2 `
+
+helm list --all-namespaces
 
 Write-Output "FINISHED: $message."
 #endregion
