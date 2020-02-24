@@ -213,6 +213,10 @@ curl -h
 -s, --silent        Silent mode
 -v, --verbose       Make the operation more talkative
 
+# Test ingress
+curl -kivL -H 'Host: thehypepipe.co.uk' 'http://<LoadBalancerExternalIp>'
+curl -kivL -H 'Host: thehypepipe.co.uk' 'http://51.140.114.66'
+
 # Should return "200" if Default backend is running ok
 curl -I https://thehypepipe.co.uk/healthz
 
