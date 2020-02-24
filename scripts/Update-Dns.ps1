@@ -64,6 +64,17 @@ Write-Verbose "Found IP [$IPAddress]"
 
 
 #region DNS
+# Split subdomain
+if ($HasSubDomainName.IsPresent) {
+    Write-Verbose "HasSubDomainName switch selected..."
+    $DomainNameSplit = $DomainName -split "\."
+    $RecordName = $DomainNameSplit[0]
+    $DomainName = $DomainNameSplit[1..($DomainNameSplit.Count)] -join "."
+
+    Write-Verbose "Selected SubDomain: [$RecordName]"
+    Write-Verbose "Selected Domain: [$DomainName]"
+}
+
 # Init
 $message = "Installing GoDaddy PowerShell module"
 Write-Verbose "`nSTARTED: $message..."
@@ -82,17 +93,6 @@ Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Writ
 # Output current records
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
 Write-Verbose "FINISHED: $message."
-
-# Get split subdomain
-if ($HasSubDomainName.IsPresent) {
-    Write-Verbose "HasSubDomainName switch selected..."
-    $DomainNameSplit = $DomainName -split "\."
-    $RecordName = $DomainNameSplit[0]
-    $DomainName = $DomainNameSplit[1..($DomainNameSplit.Count)] -join "."
-
-    Write-Verbose "Selected SubDomain: [$RecordName]"
-    Write-Verbose "Selected Domain: [$DomainName]"
-}
 
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
