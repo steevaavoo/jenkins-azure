@@ -4,6 +4,7 @@ pipeline {
 
   parameters {
     string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a 4 character prefix to ensure globally unique resource names', trim: true
+    string       name: 'DNS_SUBDOMAIN_NAME', defaultValue: 'aks', description: 'Subdomain name (default "aks")', trim: true
     choice       name: 'DNS_DOMAIN_NAME', choices: ['thehypepipe.co.uk', 'bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
     choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
@@ -114,7 +115,7 @@ pipeline {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
-        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
+        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -RecordName ${DNS_SUBDOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
         // TODO enable script below
         // pwsh(script: './scripts/Deploy-Manifests.ps1')
       }

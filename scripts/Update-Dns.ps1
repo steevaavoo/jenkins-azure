@@ -20,9 +20,10 @@ param (
     $TimeoutSeconds = 1800, # 1800s = 30 mins
     $RetryIntervalSeconds = 10,
     $DomainName,
+    $RecordName = "@",
     $ApiKey,
     $ApiSecret,
-    $Ttl = 600,
+    $Ttl = 600, # in seconds
     $ServiceLabel = 'app=nginx-ingress',
     $NameSpace = 'ingress-tls'
 )
@@ -82,7 +83,7 @@ Write-Verbose "FINISHED: $message."
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
 Write-Verbose "STARTED: $message"
-Set-GDDomainRecord -credentials $apiCredential -domain $DomainName -name '@' -ipaddress $IPAddress -type "A" -ttl $Ttl -Force
+Set-GDDomainRecord -credentials $apiCredential -domain $DomainName -name $RecordName -ipaddress $IPAddress -type "A" -ttl $Ttl -Force
 Write-Verbose "FINISHED: $message"
 
 # Output updated records
