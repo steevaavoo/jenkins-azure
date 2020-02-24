@@ -83,11 +83,15 @@ Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Writ
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
 Write-Verbose "FINISHED: $message."
 
-# Get subdomain
+# Get split subdomain
 if ($HasSubDomainName.IsPresent) {
     Write-Verbose "HasSubDomainName switch selected..."
-    $RecordName = ($DomainName -split "\.")[0]
+    $DomainNameSplit = $DomainName -split "\."
+    $RecordName = $DomainNameSplit[0]
+    $DomainName = $DomainNameSplit[1..($DomainNameSplit.Count)] -join "."
+
     Write-Verbose "Selected SubDomain: [$RecordName]"
+    Write-Verbose "Selected Domain: [$DomainName]"
 }
 
 # Update A record
