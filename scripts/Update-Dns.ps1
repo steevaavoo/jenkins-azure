@@ -20,6 +20,7 @@ param (
     $TimeoutSeconds = 1800, # 1800s = 30 mins
     $RetryIntervalSeconds = 10,
     $DomainName,
+    [switch]$HasSubDomainName,
     $RecordName = "@",
     $ApiKey,
     $ApiSecret,
@@ -60,6 +61,9 @@ $timer.Stop()
 Write-Verbose "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
 Write-Verbose "Found IP [$IPAddress]"
 
+
+
+#region DNS
 # Init
 $message = "Installing GoDaddy PowerShell module"
 Write-Verbose "`nSTARTED: $message..."
@@ -79,6 +83,12 @@ Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Writ
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
 Write-Verbose "FINISHED: $message."
 
+# Get subdomain
+if ($HasSubDomainName.IsPresent) {
+    Write-Verbose "HasSubDomainName switch selected..."
+    $RecordName = ($DomainName -split "\.")[0]
+    Write-Verbose "Selected SubDomain: [$RecordName]"
+}
 
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
@@ -88,3 +98,4 @@ Write-Verbose "FINISHED: $message"
 
 # Output updated records
 Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
+#endregion DNS
