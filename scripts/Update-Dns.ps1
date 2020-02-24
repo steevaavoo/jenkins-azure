@@ -32,7 +32,7 @@ param (
 # Ensure verbose messages are output
 $VerbosePreference = "Continue"
 # Ensure any errors fail the build
-# $ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 # Setting k8s current context
 $message = "Getting AKS credentials"
