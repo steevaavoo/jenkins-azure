@@ -10,6 +10,8 @@
   - [Install Server (CLI)](#install-server-cli)
   - [Install Server (Helm)](#install-server-helm)
   - [Backup](#backup)
+    - [NGINX example (without PersistentVolumes)](#nginx-example-without-persistentvolumes)
+    - [NGINX example (with PersistentVolumes)](#nginx-example-with-persistentvolumes)
   - [Troubleshooting](#troubleshooting)
 
 ## TODO
@@ -122,9 +124,94 @@ helm install --namespace velero -f velero-values.yaml stable/velero
 
 ## Backup
 
+### NGINX example (without PersistentVolumes)
+
 ```powershell
-# List namespaces
+# Start the sample nginx app
+kubectl apply -f ./velero/examples/nginx-app/base.yaml
+
+# Check resources and wait for EXTERNAL-IP
+kubectl get all -n nginx-example
+kubectl get svc -n nginx-example -w
+
+# Open browser to view NGINX default page
+$newUrl = kubectl get svc my-nginx -n nginx-example --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
+Write-Output "Browse to NGINX URL: $newUrl"
+
+# Create a backup
+velero backup create nginx-backup --include-namespaces nginx-example
+
+# Check backup
+velero backup describe nginx-backup
+velero backup logs nginx-backup
+
+# Simulate a disaster
 kubectl get ns
+kubectl get all -n nginx-example
+kubectl delete namespace nginx-example
+# Wait for the namespace to be deleted
+kubectl get ns
+kubectl get all -n nginx-example
+
+# Restore your lost resources
+velero restore create --from-backup nginx-backup
+
+# Check resources and wait for EXTERNAL-IP
+kubectl get ns
+kubectl get all -n nginx-example
+kubectl get svc -n nginx-example -w
+
+$newUrl = kubectl get svc my-nginx -n nginx-example --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
+Write-Output "Browse to new NGINX URL: $newUrl"
+```
+
+### NGINX example (with PersistentVolumes)
+
+```powershell
+# Start the nginx app
+kubectl apply -f ./velero/examples/nginx-app/with-pv.yaml
+
+# Check resources and wait for EXTERNAL-IP
+kubectl get all,pvc,pv -n nginx-pv
+kubectl get svc -n nginx-pv -w
+
+# Open browser to view NGINX default page
+$urlPv = kubectl get svc my-nginx-pv -n nginx-pv --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
+Write-Output "Browse to NGINX URL: $urlPv"
+
+# Create a backup
+velero backup create nginx-pv-backup --include-namespaces nginx-pv
+
+# Check backup
+velero backup describe nginx-pv-backup
+velero backup describe nginx-pv-backup --details
+velero backup logs nginx-pv-backup
+
+# Simulate a disaster
+kubectl get ns
+kubectl get all,pvc,pv -n nginx-pv
+kubectl delete namespace nginx-pv
+# Wait for the namespace to be deleted
+kubectl get ns
+kubectl get all,pvc,pv -n nginx-pv
+# pv may show as failed
+kubectl describe pv -n nginx-pv
+
+# Restore your lost resources
+velero restore create --from-backup nginx-pv-backup
+
+# Check restore
+velero restore describe nginx-pv-backup-20200225075036
+velero restore logs nginx-pv-backup-20200225075036
+
+# Check resources and wait for EXTERNAL-IP
+kubectl get ns
+kubectl get all,pvc,pv -n nginx-pv
+kubectl get svc -n nginx-pv -w
+
+$newUrlPv = kubectl get svc my-nginx-pv -n nginx-pv --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
+Write-Output "Browse to new NGINX URL: $newUrlPv"
+
 ```
 
 ## Troubleshooting
