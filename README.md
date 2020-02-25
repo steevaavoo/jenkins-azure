@@ -37,7 +37,7 @@
 - [x] Add Terraform diff summary details within input prompt (one line per resource)
 - [x] Add support for DNS subdomains, eg `aks.thehypepipe.co.uk`
 - [x] Troubleshoot `Waiting for CertificateRequest "tls-secret-1881013061" to complete`
-- [ ] Add boolean param to switch between staging and prod LetsEncrypt services:  
+- [x] Add boolean param to switch between staging and prod LetsEncrypt SSL cert issuer services:  
   https://letsencrypt.org/docs/staging-environment/
 - [ ] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
 - [ ] Add clock (or another better) example node app instead of a one sentence website:  

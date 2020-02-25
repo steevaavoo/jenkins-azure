@@ -21,31 +21,36 @@ Write-Output "STARTED: $message..."
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo update
 
+# Check if Helm release installed already
+$helmReleaseName = "nginx-ingress"
+$helmDeployedList = helm list -n ingress-tls -o json | ConvertFrom-Json
 
-# TODO add idempotent check before helm install (helm upgrade increments release, even with same values as previous release)
-# $helmList = helm list -n ingress-tls -o json | ConvertFrom-Json
-# $helmList | Where-Object Name -eq "nginx-ingress"
+if ($helmReleaseName -in $helmDeployedList.Name) {
+    Write-Output "SKIPPING: [$helmReleaseName] already deployed."
+} else {
+    Write-Output "STARTED: Installing helm release: [$helmReleaseName]..."
 
-# Use Helm to deploy an NGINX ingress controller
-# helm install nginx-ingress stable/nginx-ingress `
-#     --namespace ingress-tls `
-#     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
-#     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
-#     --set controller.extraArgs.v=3
+    # Use Helm to deploy an NGINX ingress controller
+    # helm install nginx-ingress stable/nginx-ingress `
+    #     --namespace ingress-tls `
+    #     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
+    #     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
+    #     --set controller.extraArgs.v=3
 
-# helm upgrade [RELEASE] [CHART] [flags]
-# helm upgrade something ./path/to/my/chart -f my-values.yaml --install --atomic
-helm upgrade `
-    nginx-ingress stable/nginx-ingress `
-    --install --atomic `
-    --namespace ingress-tls `
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
-    --set controller.extraArgs.v=3
+    # helm upgrade [RELEASE] [CHART] [flags]
+    # helm upgrade something ./path/to/my/chart -f my-values.yaml --install --atomic
+    helm upgrade `
+        nginx-ingress stable/nginx-ingress `
+        --install --atomic `
+        --namespace ingress-tls `
+        --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
+        --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux `
+        --set controller.extraArgs.v=3
 
-# [OPTIONAL] args
-# --set controller.extraArgs.v=3 `
-# --set controller.replicaCount=2 `
+    # [OPTIONAL] args
+    # --set controller.extraArgs.v=3 `
+    # --set controller.replicaCount=2 `
+}
 
 # Check nginx-ingress resources
 helm list --all-namespaces
