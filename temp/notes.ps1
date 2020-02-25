@@ -3,6 +3,7 @@
 docker-machine start
 
 # Load env vars for docker cli
+# may need to wait a minute after starting docker-machine vm
 & docker-machine env --shell powershell default | Invoke-Expression
 gci env:DOCKER*
 
@@ -214,35 +215,35 @@ curl -h
 -v, --verbose       Make the operation more talkative
 
 # Test ingress
-curl -kivL -H 'Host: thehypepipe.co.uk' 'http://<LoadBalancerExternalIp>'
-curl -kivL -H 'Host: thehypepipe.co.uk' 'http://51.140.114.66'
+# curl -kivL -H 'Host: <HostUsedWithinIngressConfig>' 'http://<LoadBalancerExternalIp>'
+curl -kivL -H 'Host: aks.thehypepipe.co.uk' 'http://51.140.114.66'
 
 # Should return "200" if Default backend is running ok
-curl -I https://thehypepipe.co.uk/healthz
+curl -I https://aks.thehypepipe.co.uk/healthz
 
 # Should return "200", maybe "404" if configured wrong
-curl -I https://thehypepipe.co.uk/helloworld
+curl -I https://aks.thehypepipe.co.uk/helloworld
 
 # Show HTML output
-curl https://thehypepipe.co.uk/helloworld
-curl https://thehypepipe.co.uk
+curl https://aks.thehypepipe.co.uk/helloworld
+curl https://aks.thehypepipe.co.uk
 
 # Misc
-curl -I https://thehypepipe.co.uk/helloworld
-curl -I https://thehypepipe.co.uk
+curl -I https://aks.thehypepipe.co.uk/helloworld
+curl -I https://aks.thehypepipe.co.uk
 # Ignore cert errors
-curl -i -k https://thehypepipe.co.uk/helloworld
-curl -i -k https://thehypepipe.co.uk
+curl -i -k https://aks.thehypepipe.co.uk/helloworld
+curl -i -k https://aks.thehypepipe.co.uk
 
 # Check SSL
 # Use www.ssllabs.com for thorough SSL cert check
-https://www.ssllabs.com/ssltest/analyze.html?d=thehypepipe.co.uk
+https://www.ssllabs.com/ssltest/analyze.html?d=aks.thehypepipe.co.uk
 
 # openssl s_client -connect host:port -status
 # openssl s_client -connect host:port -status [-showcerts]
-openssl s_client -connect thehypepipe.co.uk:443 | sls "CN =|error"
-openssl s_client -connect thehypepipe.co.uk:443 -status -showcerts
-openssl s_client -connect thehypepipe.co.uk:443 -status
+openssl s_client -connect aks.thehypepipe.co.uk:443 | sls "CN =|error"
+openssl s_client -connect aks.thehypepipe.co.uk:443 -status -showcerts
+openssl s_client -connect aks.thehypepipe.co.uk:443 -status
 
 # ! COMMON ISSUES
 # - default-backend-service will show when ingress not configured correctly or it does not have endpoints
@@ -337,7 +338,7 @@ kubectl exec -it $certManagerPod cert-manager sh
 kubectl exec -it $caInjectorPod sh
 kubectl exec -it $webhookPod sh
 # Check dns lookup
-nslookup thehypepipe.co.uk
+nslookup aks.thehypepipe.co.uk
 
 # TODO WIP
 # Main issue in initial Jenkins build when running:
@@ -348,6 +349,8 @@ nslookup thehypepipe.co.uk
 clusterissuer.cert-manager.io/letsencrypt configured
 
 # Check cert issuer
+# ClusterIssuer has cluster-wide scope
+# Issuer has namespace scope
 kubectl get ClusterIssuer -A
 kubectl get Issuer -A
 
@@ -361,20 +364,25 @@ kubectl get apiservice v1beta1.webhook.certmanager.k8s.io
 kubectl get apiservice | sls "webhook"
 
 
-# Check ClusterIssuer
+# Check ClusterIssuer is READY
+# - Status > Conditions
+# - Message: The ACME account was registered with the ACME server
 kubectl get ClusterIssuer -A -o wide
-kubectl describe ClusterIssuer letsencrypt
+kubectl describe ClusterIssuer letsencrypt-prod
+kubectl describe ClusterIssuer letsencrypt-staging
 
-# Check Certificate
+# Check Certificate is READY
+# - Status > Conditions
+# - Message: Certificate is up to date and has not expired
 kubectl get cert -A -o wide
 kubectl describe cert tls-secret
 kubectl get cert tls-secret --watch
 kubectl delete cert tls-secret
 
 # Check Secret
-kubectl get secret -A
+# Annotations should include multiple cert-manager.io entries
+kubectl get secret tls-secret -o wide
 kubectl describe secret tls-secret
-kubectl describe secret letsencrypt
 
 
 # Recreate ingress
