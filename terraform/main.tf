@@ -19,6 +19,12 @@ resource "azurerm_container_registry" "aks" {
   admin_enabled       = var.acr_admin_enabled
   sku                 = var.acr_sku
   tags                = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 
@@ -30,6 +36,12 @@ resource "azurerm_log_analytics_workspace" "aks" {
   resource_group_name = azurerm_resource_group.aks.name
   sku                 = "PerGB2018"
   tags                = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_log_analytics_solution" "aks" {
@@ -97,6 +109,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ignore_changes = [
       service_principal,
       default_node_pool[0].node_count,
+      tags,
       # addon_profile,
     ]
   }
