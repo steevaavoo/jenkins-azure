@@ -35,7 +35,10 @@
 - [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [x] Add Terraform diff summary within input prompt (single line summary)
 - [x] Add Terraform diff summary details within input prompt (one line per resource)
-- [ ] Add support for DNS subdomains, eg `aks.thehypepipe.co.uk`
+- [x] Add support for DNS subdomains, eg `aks.thehypepipe.co.uk`
+- [x] Troubleshoot `Waiting for CertificateRequest "tls-secret-1881013061" to complete`
+- [ ] Add boolean param to switch between staging and prod LetsEncrypt services:  
+  https://letsencrypt.org/docs/staging-environment/
 - [ ] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
 - [ ] Add clock (or another better) example node app instead of a one sentence website:  
   https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
@@ -44,6 +47,7 @@
   - https://github.com/helm/charts/tree/master/stable/wordpress
   - https://aksworkshop.io/
 - [ ] Add Velero backup (after adding StatefulSet example)
+- [ ] Fix `Replace-Tokens.ps1` adding blank lines to YAML files
 - [ ] Complete this README with proper usage instructions
 
 ```powershell
