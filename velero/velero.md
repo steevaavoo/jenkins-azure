@@ -9,6 +9,7 @@
   - [Install CLI](#install-cli)
   - [Install Server (CLI)](#install-server-cli)
   - [Install Server (Helm)](#install-server-helm)
+  - [Backup](#backup)
   - [Troubleshooting](#troubleshooting)
 
 ## TODO
@@ -83,7 +84,7 @@ velero install `
     --provider azure `
     --plugins velero/velero-plugin-for-microsoft-azure:v1.0.0 `
     --bucket $blobContainerName `
-    --secret-file ./temp/credentials-velero `
+    --secret-file ./velero/credentials-velero `
     --backup-location-config resourceGroup=$backupResourceGroupName,storageAccount=$storageAccountName `
     --snapshot-location-config apiTimeout=5m `
     --v 3
@@ -117,6 +118,13 @@ helm repo update
 
 # Show CLI help
 helm install --namespace velero -f velero-values.yaml stable/velero
+```
+
+## Backup
+
+```powershell
+# List namespaces
+kubectl get ns
 ```
 
 ## Troubleshooting
