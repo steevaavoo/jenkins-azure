@@ -60,7 +60,6 @@ Describe "Integration Tests" {
 
         # Vars
         $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
-        $testUrl = "https://thehypepipe.co.uk"
         $testUrlNodeApp = "$($testUrl)/helloworld"
         $allowedStatusCodes = @(200, 304, 404, 503)
         $expectedContent = "Hello world"
