@@ -42,7 +42,7 @@
 function Test-SslProtocol {
     param(
         [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true)]
-        $ComputerName = "aks.thehypepipe.co.uk",
+        $ComputerName,
 
         [Parameter(ValueFromPipelineByPropertyName=$true)]
         [int]$Port = 443
@@ -86,6 +86,9 @@ function Test-SslProtocol {
     }
 } # function Test-SslProtocol
 
+<#
+# Example Pester tests
+
 # List of Web sites that we want to check the SSL on
 $WebSitesToTest = @(
     'www.google.com'
@@ -112,3 +115,4 @@ Describe 'SSL endpoints' {
         }
     }
 }
+#>
