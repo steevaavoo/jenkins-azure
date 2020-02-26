@@ -39,10 +39,10 @@
 - [x] Troubleshoot `Waiting for CertificateRequest "tls-secret-1881013061" to complete`
 - [x] Add boolean param to switch between staging and prod LetsEncrypt SSL cert issuer services:  
   https://letsencrypt.org/docs/staging-environment/
-- [x] Add integration test to check staging cert is issued by `Fake LE Intermediate*` server
-- [ ] Troubleshoot `Connection refused 172.17.0.3:0` in cert test
-- [ ] Add integration test to check prod cert is issued by `TODO<Prod Server>*` server
-- [ ] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
+- [x] Add integration test to check staging cert is issued by `Fake LE Intermediate` server
+- [x] Troubleshoot `Connection refused 172.17.0.3:0` in cert test
+- [x] Add integration test to check prod cert is issued by `Let's Encrypt Authority` server
+- [x] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
 - [ ] Add clock (or another better) example node app instead of a one sentence website:  
   https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Add a StatefulSet app example (research below):  
