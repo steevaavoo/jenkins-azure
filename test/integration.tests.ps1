@@ -80,4 +80,30 @@ Describe "Integration Tests" {
             curl -k -s $testUrlNodeApp | Should be $expectedContent
         }
     }
+
+
+    # SSL Certificate has been issued
+    Context "When an SSL Certificate has been issued for: [$env:DNS_DOMAIN_NAME]" {
+
+        # Vars
+        $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
+        $testUrlNodeApp = "$($testUrl)/helloworld"
+
+        # Assign expected Issuer name
+        switch ($env:CERT_API_ENVIRONMENT) {
+            prod { $expectedIssuerName = "" }
+            staging { $expectedIssuerName = "Fake LE Intermediate" }
+            Default { $expectedIssuerName = "NOT DEFINED" }
+        }
+
+        # Get cert
+        ./../scripts/Get-CertInfo.ps1
+        $cert = Get-CertInfo -Hostname "aks.thehypepipe.co.uk" -Port 443
+
+        # Tests
+        It "The SSL cert for [$testUrlNodeApp] should be issued by: [$expectedIssuerName]" {
+            $cert = Get-CertInfo -Hostname "aks.thehypepipe.co.uk" -Port 443
+            $cert.Issuer -match $expectedIssuerName | Should Be $allowedStatusCodes
+        }
+    }
 }
