@@ -102,7 +102,7 @@ Describe "Integration Tests" {
 
         # Tests
         It "The SSL cert for [$testUrlNodeApp] should be issued by: [$expectedIssuerName]" {
-            $cert.Issuer -match $expectedIssuerName | Should Be $allowedStatusCodes
+            $cert.Issuer -match $expectedIssuerName | Should Be $true
         }
     }
 }
