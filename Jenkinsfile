@@ -126,8 +126,7 @@ pipeline {
     stage('Test') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
-        pwsh(script: './test/temp.ps1')
-        pwsh(script: './scripts/test.ps1')
+        pwsh(script: './scripts/Start-Test.ps1')
       }
     }
 
