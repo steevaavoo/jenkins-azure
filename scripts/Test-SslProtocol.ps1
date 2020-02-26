@@ -41,6 +41,7 @@
 #>
 
 function Test-SslProtocol {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ValueFromPipeline = $true)]
         $ComputerName,

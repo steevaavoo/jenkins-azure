@@ -1,5 +1,5 @@
 # Enable verbose output
-if ($env:CI_DEBUG -eq "true") { $VerboseActionPreference = "Continue" }
+if ($env:CI_DEBUG -eq "true") { $VerbosePreference = "Continue" }
 
 Write-Verbose "Started in folder: [$(Get-Location)]"
 Write-Verbose "Changing directory to test folder..."

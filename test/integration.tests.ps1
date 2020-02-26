@@ -97,28 +97,38 @@ Describe "Integration Tests" {
             Default { $expectedIssuerName = "NOT DEFINED" }
         }
 
-        # Get cert
-        . ../scripts/Test-SslProtocol.ps1
-        $sslResult = Test-SslProtocol -ComputerName $hostname -Port $port
+        # Get common cert info
+        . ../scripts/Get-CertInfo.ps1
+        $certResult = Get-CertInfo -ComputerName $hostname -Port $port
 
         # DEBUG Output
-        if ($env:CI_DEBUG -eq "true") { $sslResult | Format-List * }
+        if ($env:CI_DEBUG -eq "true") { $certResult | Format-List * }
 
         # Tests
         It "Should have a [$env:CERT_API_ENVIRONMENT] SSL cert for [$hostname] issued by: [$expectedIssuerName]" {
-            $sslResult.Certificate.Issuer -match $expectedIssuerName | Should Be $true
+            $certResult.Issuer -match $expectedIssuerName | Should Be $true
         }
 
-        It "Should have Signature Algorithm of [sha256RSA]" {
-            $sslResult.SignatureAlgorithm | Should Be "sha256RSA"
-        }
+        # Do extra supported tests if on Windows OS
+        if ($IsWindows) {
+            # Get cert
+            . ../scripts/Test-SslProtocol.ps1
+            $sslResult = Test-SslProtocol -ComputerName $hostname -Port $port
 
-        It "Should support TLS1.2" {
-            $sslResult.TLS12 | Should Be $True
-        }
+            # DEBUG Output
+            if ($env:CI_DEBUG -eq "true") { $sslResult | Format-List * }
 
-        It "Should not expire within [$warningThreshold] days" {
-            ($sslResult.Certificate.NotAfter -gt (Get-Date).AddDays($warningThreshold)) | Should Be $True
+            It "Should have Signature Algorithm of [sha256RSA]" {
+                $sslResult.SignatureAlgorithm | Should Be "sha256RSA"
+            }
+
+            It "Should support TLS1.2" {
+                $sslResult.TLS12 | Should Be $True
+            }
+
+            It "Should not expire within [$warningThreshold] days" {
+                ($sslResult.Certificate.NotAfter -gt (Get-Date).AddDays($warningThreshold)) | Should Be $True
+            }
         }
     }
 }
