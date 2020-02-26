@@ -15,20 +15,20 @@ function Get-CertInfo {
     )
 
     try {
-        $Conn = New-Object System.Net.Sockets.TcpClient($WebsiteURL, $WebsitePort)
+        $conn = New-Object System.Net.Sockets.TcpClient($Hostname, $Port)
         try {
-            $Stream = New-Object System.Net.Security.SslStream($Conn.GetStream(), $false, {
+            $stream = New-Object System.Net.Security.SslStream($conn.GetStream(), $false, {
                     param($sender, $certificate, $chain, $sslPolicyErrors)
                     return $true
                 })
-            $Stream.AuthenticateAsClient($Hostname)
+            $stream.AuthenticateAsClient($Hostname)
 
-            $Cert = $Stream.Get_RemoteCertificate()
+            $cert = $stream.Get_RemoteCertificate()
             # $CN = (($cert.Subject -split "=")[1] -split ",")[0]
-            $Cert
+            $cert
         } catch { throw $_ }
-        finally { $Conn.close() }
+        finally { $conn.close() }
     } catch {
-        Write-Host "$ID $WebsiteURL " $_.exception.innerexception.message -ForegroundColor red
+        Write-Host "$ID $Hostname " $_.exception.innerexception.message -ForegroundColor red
     }
 }

@@ -85,23 +85,19 @@ Describe "Integration Tests" {
     # SSL Certificate has been issued
     Context "When an SSL Certificate has been issued for: [$env:DNS_DOMAIN_NAME]" {
 
-        # Vars
-        $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
-        $testUrlNodeApp = "$($testUrl)/helloworld"
-
         # Assign expected Issuer name
         switch ($env:CERT_API_ENVIRONMENT) {
-            prod { $expectedIssuerName = "" }
+            prod { $expectedIssuerName = "Let's Encrypt Authority" }
             staging { $expectedIssuerName = "Fake LE Intermediate" }
             Default { $expectedIssuerName = "NOT DEFINED" }
         }
 
         # Get cert
         . ../scripts/Get-CertInfo.ps1
-        $cert = Get-CertInfo -Hostname $testUrlNodeApp -Port 443
+        $cert = Get-CertInfo -Hostname $env:DNS_DOMAIN_NAME -Port 443
 
         # Tests
-        It "The SSL cert for [$testUrlNodeApp] should be issued by: [$expectedIssuerName]" {
+        It "The SSL cert for [$env:DNS_DOMAIN_NAME] should be issued by: [$expectedIssuerName]" {
             $cert.Issuer -match $expectedIssuerName | Should Be $true
         }
     }
