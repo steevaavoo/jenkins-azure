@@ -13,6 +13,7 @@
     - [NGINX example (without PersistentVolumes)](#nginx-example-without-persistentvolumes)
     - [NGINX example (with PersistentVolumes)](#nginx-example-with-persistentvolumes)
   - [Troubleshooting](#troubleshooting)
+  - [Cleanup](#cleanup)
 
 ## TODO
 
@@ -229,7 +230,6 @@ kubectl get deployment -n nginx-pv --watch
 kubectl get svc -n nginx-pv -w
 $newUrlPv = kubectl get svc my-nginx-pv -n nginx-pv --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
 Write-Output "Browse to new NGINX URL: $newUrlPv"
-
 ```
 
 ## Troubleshooting
@@ -262,3 +262,11 @@ kubectl -n velero logs DAEMON_POD_NAME
 
 **NOTE**: You can increase the verbosity of the pod logs by adding --log-level=debug as an argument to the
 container command in the deployment/daemonset pod template spec.
+
+## Cleanup
+
+```powershell
+# Delete Resource Groups
+az group delete --name $backupResourceGroupName --verbose
+az group delete --name $snapshotResourceGroupName --verbose
+```
