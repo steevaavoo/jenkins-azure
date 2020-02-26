@@ -4,7 +4,10 @@ pipeline {
 
   parameters {
     string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a 4 character prefix to ensure globally unique resource names', trim: true
-    choice       name: 'DNS_DOMAIN_NAME', choices: ['thehypepipe.co.uk', 'bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
+    string       name: 'EMAIL_ADDRESS', defaultValue: 'admin@domain.com', description: 'Enter an email address used for SSL cert info', trim: true
+    choice       name: 'DNS_DOMAIN_NAME', choices: ['aks.thehypepipe.co.uk', 'aks.bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
+    choice       name: 'CERT_API_ENVIRONMENT', choices: ['staging', 'prod'], description: 'Select which SSL cert API environment is used.'
+    booleanParam name: 'HAS_SUBDOMAIN', defaultValue: true, description: 'Tick if using a subdomain (true), or untick if just base domain name used (false).'
     choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
     booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
@@ -114,15 +117,16 @@ pipeline {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
+        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -HasSubDomainName:\$${HAS_SUBDOMAIN} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
+        pwsh(script: './scripts/Deploy-Cert-Manager.ps1')
         pwsh(script: './scripts/Deploy-Manifests.ps1')
-        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
       }
     }
 
     stage('Test') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
-        pwsh(script: './scripts/test.ps1')
+        pwsh(script: './scripts/Start-Test.ps1')
       }
     }
 

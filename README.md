@@ -35,7 +35,14 @@
 - [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
 - [x] Add Terraform diff summary within input prompt (single line summary)
 - [x] Add Terraform diff summary details within input prompt (one line per resource)
-- [ ] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
+- [x] Add support for DNS subdomains, eg `aks.thehypepipe.co.uk`
+- [x] Troubleshoot `Waiting for CertificateRequest "tls-secret-1881013061" to complete`
+- [x] Add boolean param to switch between staging and prod LetsEncrypt SSL cert issuer services:  
+  https://letsencrypt.org/docs/staging-environment/
+- [x] Add integration test to check staging cert is issued by `Fake LE Intermediate` server
+- [x] Troubleshoot `Connection refused 172.17.0.3:0` in cert test
+- [x] Add integration test to check prod cert is issued by `Let's Encrypt Authority` server
+- [x] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
 - [ ] Add clock (or another better) example node app instead of a one sentence website:  
   https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
 - [ ] Add a StatefulSet app example (research below):  
@@ -43,6 +50,7 @@
   - https://github.com/helm/charts/tree/master/stable/wordpress
   - https://aksworkshop.io/
 - [ ] Add Velero backup (after adding StatefulSet example)
+- [ ] Fix `Replace-Tokens.ps1` adding blank lines to YAML files
 - [ ] Complete this README with proper usage instructions
 
 ```powershell

@@ -36,7 +36,11 @@ if ($output = Get-Content $TFDiffFilename | Select-String "Plan:.*add.*change.*d
     * Quantifier - Matches between zero and unlimited times, as many times as possible, giving back as needed (greedy)
     \+ matches the character + literally (case sensitive)
     #>
-    (Get-Content $TFDiffFilename) | Select-String "^\s*~", "^\s*\+", "^\s*-"
+    # Returns both changed top-level resources, and their attributes
+    # (Get-Content $TFDiffFilename) | Select-String "^\s*~", "^\s*\+", "^\s*-"
+
+    # Only return the top-level resources (not resource attributes too)
+    (Get-Content $TFDiffFilename) | Select-String "^  ~", "^  \+", "^  -"
 
 } else {
     "[NOT FOUND]"
