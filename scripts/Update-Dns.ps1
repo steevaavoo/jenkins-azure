@@ -38,7 +38,7 @@ $ErrorActionPreference = "Stop"
 $message = "Getting AKS credentials"
 Write-Verbose "`nSTARTED: $message..."
 az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
-Write-Verbose "FINISHED: $message."
+Write-Verbose "FINISHED: $message.`n"
 
 # Wait for Loadbalancer IP to exist
 $timer = [Diagnostics.Stopwatch]::StartNew()
@@ -58,7 +58,7 @@ while (-not ($IPAddress = kubectl get service -l $ServiceLabel --namespace $Name
 $timer.Stop()
 
 # Update pipeline variable
-Write-Verbose "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
+Write-Verbose "`nCreation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
 Write-Verbose "Found IP [$IPAddress]"
 
 

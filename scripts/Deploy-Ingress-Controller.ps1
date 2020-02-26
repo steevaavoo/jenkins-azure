@@ -26,9 +26,9 @@ $helmReleaseName = "nginx-ingress"
 $helmDeployedList = helm list -n ingress-tls -o json | ConvertFrom-Json
 
 if ($helmReleaseName -in $helmDeployedList.Name) {
-    Write-Output "SKIPPING: [$helmReleaseName] already deployed."
+    Write-Output "`nSKIPPING: [$helmReleaseName] already deployed."
 } else {
-    Write-Output "STARTED: Installing helm release: [$helmReleaseName]..."
+    Write-Output "`nSTARTED: Installing helm release: [$helmReleaseName]..."
 
     # Use Helm to deploy an NGINX ingress controller
     # helm install nginx-ingress stable/nginx-ingress `
