@@ -97,7 +97,7 @@ Describe "Integration Tests" {
         $cert = Get-CertInfo -Hostname $env:DNS_DOMAIN_NAME -Port 443
 
         # Tests
-        It "The SSL cert for [$env:DNS_DOMAIN_NAME] should be issued by: [$expectedIssuerName]" {
+        It "The [$env:CERT_API_ENVIRONMENT] SSL cert for [$env:DNS_DOMAIN_NAME] should be issued by: [$expectedIssuerName]" {
             $cert.Issuer -match $expectedIssuerName | Should Be $true
         }
     }
