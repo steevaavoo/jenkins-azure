@@ -8,6 +8,12 @@ resource "azurerm_resource_group" "aks" {
   name     = var.azure_resourcegroup_name
   location = var.location
   tags     = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 
