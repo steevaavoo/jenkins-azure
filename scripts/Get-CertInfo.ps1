@@ -6,8 +6,6 @@
 # Written by: Rob VandenBrink
 #
 # Params: Site name or IP ($Hostname), Port ($Port)
-Write-Host "Loading Get-CertInfo.ps1"
-
 function Get-CertInfo {
     param (
         $Hostname,
