@@ -101,6 +101,9 @@ Describe "Integration Tests" {
         . ../scripts/Test-SslProtocol.ps1
         $sslResult = Test-SslProtocol -ComputerName $hostname -Port $port
 
+        # DEBUG Output
+        if ($env:CI_DEBUG -eq "true") { $sslResult | Format-List * }
+
         # Tests
         It "Should have a [$env:CERT_API_ENVIRONMENT] SSL cert for [$hostname] issued by: [$expectedIssuerName]" {
             $sslResult.Certificate.Issuer -match $expectedIssuerName | Should Be $true
