@@ -85,6 +85,9 @@ docker push $dockerUser/psjenkinsagent:$tag ; docker push $dockerUser/psjenkinsa
 
 # Run
 docker run --rm -it --name jenkins-agent $dockerUser/psjenkinsagent:latest pwsh
+
+# Run with mounted volume
+docker run --rm -it -v ${PWD}:/data --workdir=/data --name jenkins-agent $dockerUser/psjenkinsagent:latest pwsh
 #endregion Jenkins Agent
 
 
