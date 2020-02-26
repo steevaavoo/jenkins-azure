@@ -1,5 +1,8 @@
 # Deploy cert-manager
 
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 #region cert-manager
 # https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm
 $message = "[HELM] Installing cert-manager"
