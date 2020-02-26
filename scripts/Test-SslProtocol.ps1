@@ -39,6 +39,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 #>
+
 function Test-SslProtocol {
     param(
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ValueFromPipeline = $true)]
@@ -85,6 +86,7 @@ function Test-SslProtocol {
     }
 } # function Test-SslProtocol
 
+Write-Verbose "LOADED: Test-SslProtocol.ps1"
 
 # Example Pester tests
 <#

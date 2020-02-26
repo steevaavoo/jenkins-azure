@@ -110,7 +110,7 @@ Describe "Integration Tests" {
         }
 
         It "Should have Signature Algorithm of [sha256RSA]" {
-            $sslResult.SignatureAlgorithm.FriendlyName | Should Be "sha256RSA"
+            $sslResult.SignatureAlgorithm | Should Be "sha256RSA"
         }
 
         It "Should support TLS1.2" {
