@@ -27,13 +27,14 @@
 ```powershell
 # Vars
 $location = "uksouth"
-$backupResourceGroupName = ""
-$storageAccountName = ""
+$backupResourceGroupName = "ruba-rg-bck"
+$snapshotResourceGroupName = "ruba-rg-snap"
+$storageAccountName = "rubastbckuksouth001"
 $blobContainerName = "velero"
-$aksAutoGenResourceGroup = ""
 
-# Create Resource Group
-az group create --name $backupResourceGroupName --location $location --verbose
+# Create Resource Groups
+az group create --name $backupResourceGroupName --location $location
+az group create --name $snapshotResourceGroupName --location $location
 
 # Create Storage Account
 az storage account create `
@@ -64,6 +65,7 @@ velero version
 
 ```powershell
 # Create namespace
+kubectl get namespace
 kubectl create namespace velero
 
 # Check velero-plugin-for-microsoft-azure release version:
@@ -82,26 +84,23 @@ kubectl create namespace velero
 velero install -h
 
 # Install
+# TODO: add separate snapshot resource group
 velero install `
     --provider azure `
     --plugins velero/velero-plugin-for-microsoft-azure:v1.0.0 `
     --bucket $blobContainerName `
     --secret-file ./velero/credentials-velero `
     --backup-location-config resourceGroup=$backupResourceGroupName,storageAccount=$storageAccountName `
-    --snapshot-location-config apiTimeout=5m `
-    --v 3
+    --snapshot-location-config apiTimeout=5m,resourceGroup=$snapshotResourceGroupName `
+    --v=3
 
-# Check
-kubectl logs deployment/velero -n velero
+# Monitor deployment progress
 kubectl get all -n velero
 kubectl describe pod -n velero
-kubectl get pod -n velero --watch
-
-$podName = kubectl get pod -n velero -l component=velero -o jsonpath="{.items[0].metadata.name}"
-kubectl logs $podName -n velero
-
-# Cleanup (during error)
-kubectl delete namespace velero
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace velero
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace velero --watch
+kubectl get deployment -n velero --watch
+kubectl logs deployment/velero -n velero -f
 ```
 
 ## Install Server (Helm)
@@ -171,6 +170,15 @@ Write-Output "Browse to new NGINX URL: $newUrl"
 # Start the nginx app
 kubectl apply -f ./velero/examples/nginx-app/with-pv.yaml
 
+# Monitor deployment progress
+kubectl get all,pvc,pv -n nginx-pv
+kubectl describe pod -n nginx-pv
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace nginx-pv
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace nginx-pv --watch
+kubectl get deployment -n nginx-pv --watch
+# kubectl logs deployment/nginx-deployment -n nginx-pv -f -c nginx
+# kubectl logs deployment/nginx-deployment -n nginx-pv -f --all-containers
+
 # Check resources and wait for EXTERNAL-IP
 kubectl get all,pvc,pv -n nginx-pv
 kubectl get svc -n nginx-pv -w
@@ -191,24 +199,34 @@ velero backup logs nginx-pv-backup
 kubectl get ns
 kubectl get all,pvc,pv -n nginx-pv
 kubectl delete namespace nginx-pv
+kubectl delete namespace nginx-pv
 # Wait for the namespace to be deleted
 kubectl get ns
 kubectl get all,pvc,pv -n nginx-pv
-# pv may show as failed
+# pv shows as failed
 kubectl describe pv -n nginx-pv
+# pv may be deleted, but can delete ourselves
+kubectl delete pv -n nginx-pv
+kubectl delete persistentvolume/pvc-17b8832c-58ec-11ea-9ec4-6e4d21b19189 -n nginx-pv
 
 # Restore your lost resources
 velero restore create --from-backup nginx-pv-backup
 
 # Check restore
-velero restore describe nginx-pv-backup-20200225075036
-velero restore logs nginx-pv-backup-20200225075036
+velero restore describe
+velero restore logs nginx-pv-backup-20200226231755
 
-# Check resources and wait for EXTERNAL-IP
+# Monitor restore progress
 kubectl get ns
 kubectl get all,pvc,pv -n nginx-pv
-kubectl get svc -n nginx-pv -w
+kubectl describe pod -n nginx-pv
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace nginx-pv
+kubectl get deployment -n nginx-pv --watch
+# kubectl logs deployment/nginx-deployment -n nginx-pv -f -c nginx
+# kubectl logs deployment/nginx-deployment -n nginx-pv -f --all-containers
 
+# Check resources and wait for EXTERNAL-IP
+kubectl get svc -n nginx-pv -w
 $newUrlPv = kubectl get svc my-nginx-pv -n nginx-pv --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
 Write-Output "Browse to new NGINX URL: $newUrlPv"
 
