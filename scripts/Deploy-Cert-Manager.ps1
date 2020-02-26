@@ -1,6 +1,5 @@
 # Deploy cert-manager
 
-
 #region cert-manager
 # https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm
 $message = "[HELM] Installing cert-manager"
@@ -38,11 +37,6 @@ if ($helmReleaseName -in $helmDeployedList.Name) {
         --namespace ingress-tls `
         --version v0.13.1
 
-    # helm install `
-    #     cert-manager jetstack/cert-manager `
-    #     --namespace ingress-tls `
-    #     --version v0.13.1
-
     # [OPTIONAL] args
     # --set ingressShim.defaultIssuerName=letsencrypt `
     # --set ingressShim.defaultIssuerKind=ClusterIssuer `
@@ -52,13 +46,6 @@ if ($helmReleaseName -in $helmDeployedList.Name) {
 # Verify
 # Show cert-manager pods
 kubectl get pods -l app.kubernetes.io/instance=cert-manager -o wide --namespace ingress-tls
-
-# Apply staging cluster-issuer
-kubectl apply -n ingress-tls -f ./manifests/cluster-issuer-staging.yml
-kubectl delete -n ingress-tls -f ./manifests/cluster-issuer-staging.yml
-kubectl describe issuer letsencrypt-staging
-kubectl describe certificate tls-secret
-kubectl describe secret tls-secret
 
 Write-Output "FINISHED: $message.`n"
 #endregion
