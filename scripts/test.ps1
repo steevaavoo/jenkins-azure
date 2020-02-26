@@ -1,6 +1,3 @@
-# Ensure any errors fail the build
-$ErrorActionPreference = "Stop"
-
 # Enable verbose output
 if ($env:CI_DEBUG -eq "true") { $VerboseActionPreference = "Continue" }
 

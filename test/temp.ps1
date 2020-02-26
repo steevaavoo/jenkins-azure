@@ -1,3 +1,10 @@
+# Enable verbose output
+if ($env:CI_DEBUG -eq "true") { $VerboseActionPreference = "Continue" }
+
+Write-Verbose "Started in folder: [$(Get-Location)]"
+Write-Verbose "Changing directory to test folder..."
+Set-Location "test"
+Write-Verbose "STARTED: pwsh test tasks in current folder: [$(Get-Location)]"
 
 
 # Vars
