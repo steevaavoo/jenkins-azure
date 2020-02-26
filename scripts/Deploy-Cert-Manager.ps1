@@ -20,15 +20,34 @@ helm repo update
 
 # Install the cert-manager Helm chart
 # https://hub.helm.sh/charts/jetstack/cert-manager
-helm install `
-    cert-manager jetstack/cert-manager `
-    --namespace ingress-tls `
-    --version v0.13.1
 
-# [OPTIONAL] args
-# --set ingressShim.defaultIssuerName=letsencrypt `
-# --set ingressShim.defaultIssuerKind=ClusterIssuer `
-# --set extraArgs={"--dns01-recursive-nameservers=8.8.8.8:53,8.8.4.4:53"}
+# Check if Helm release installed already
+$helmReleaseName = "cert-manager"
+$helmDeployedList = helm list -n ingress-tls -o json | ConvertFrom-Json
+
+if ($helmReleaseName -in $helmDeployedList.Name) {
+    Write-Output "SKIPPING: [$helmReleaseName] already deployed."
+} else {
+    Write-Output "STARTED: Installing helm release: [$helmReleaseName]..."
+
+    # helm upgrade [RELEASE] [CHART] [flags]
+    # helm upgrade something ./path/to/my/chart -f my-values.yaml --install --atomic
+    helm upgrade `
+        cert-manager jetstack/cert-manager `
+        --install --atomic `
+        --namespace ingress-tls `
+        --version v0.13.1
+
+    # helm install `
+    #     cert-manager jetstack/cert-manager `
+    #     --namespace ingress-tls `
+    #     --version v0.13.1
+
+    # [OPTIONAL] args
+    # --set ingressShim.defaultIssuerName=letsencrypt `
+    # --set ingressShim.defaultIssuerKind=ClusterIssuer `
+    # --set extraArgs={"--dns01-recursive-nameservers=8.8.8.8:53,8.8.4.4:53"}
+}
 
 # Verify
 # Show cert-manager pods
