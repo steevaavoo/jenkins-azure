@@ -97,12 +97,11 @@ Describe "Integration Tests" {
         }
 
         # Get cert
-        ./../scripts/Get-CertInfo.ps1
-        $cert = Get-CertInfo -Hostname "aks.thehypepipe.co.uk" -Port 443
+        . ../scripts/Get-CertInfo.ps1
+        $cert = Get-CertInfo -Hostname $testUrlNodeApp -Port 443
 
         # Tests
         It "The SSL cert for [$testUrlNodeApp] should be issued by: [$expectedIssuerName]" {
-            $cert = Get-CertInfo -Hostname "aks.thehypepipe.co.uk" -Port 443
             $cert.Issuer -match $expectedIssuerName | Should Be $allowedStatusCodes
         }
     }
