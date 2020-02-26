@@ -71,7 +71,6 @@ function Test-SslProtocol {
                 $SslStream = New-Object System.Net.Security.SslStream($NetStream, $true)
                 $SslStream.AuthenticateAsClient($ComputerName,  $null, $ProtocolName, $false )
                 $RemoteCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]$SslStream.RemoteCertificate
-                $RemoteCertificate
                 $ProtocolStatus["KeyLength"] = $RemoteCertificate.PublicKey.Key.KeySize
                 $ProtocolStatus["SignatureAlgorithm"] = $RemoteCertificate.SignatureAlgorithm.FriendlyName
                 $ProtocolStatus["Certificate"] = $RemoteCertificate
@@ -86,9 +85,9 @@ function Test-SslProtocol {
     }
 } # function Test-SslProtocol
 
-<#
-# Example Pester tests
 
+# Example Pester tests
+<#
 # List of Web sites that we want to check the SSL on
 $WebSitesToTest = @(
     'www.google.com'
@@ -102,17 +101,20 @@ $WarningThreshold = 14
 Describe 'SSL endpoints' {
     foreach ($WebSite in $WebSitesToTest) {
         Context $WebSite {
-            $SSLResult = Test-SslProtocol -ComputerName $WebSite -Port 443
-            It 'Should have Signature Algorithm of sha256RSA' {
-                $SSLResult.SignatureAlgorithm | Should Be 'sha256RSA'
+            $SSLResult = Test-SslProtocol -ComputerName $WebSite -Port 443 -Verbose
+            It 'Should have Signature Algorithm of [sha256RSA]' {
+                $SSLResult.SignatureAlgorithm.FriendlyName | Should Be 'sha256RSA'
             }
+
             It 'Should support TLS1.2' {
                 $SSLResult.TLS12 | Should Be $True
             }
-            It "Should not going to expire in $WarningThreshold days" {
-                ($SSLResult.Certificate.NotAfter -gt (Get-Date).AddDays($WarningThreshold))| Should Be $True
+
+            It "Should not expire within [$WarningThreshold] days" {
+                ($SSLResult.Certificate.NotAfter -gt (Get-Date).AddDays($WarningThreshold)) | Should Be $True
             }
         }
     }
 }
+
 #>

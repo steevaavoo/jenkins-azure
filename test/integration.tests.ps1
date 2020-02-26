@@ -61,7 +61,7 @@ Describe "Integration Tests" {
         # Vars
         $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
         $testUrlNodeApp = "$($testUrl)/helloworld"
-        $allowedStatusCodes = @(200, 304, 404, 503)
+        $allowedStatusCodes = @(200, 304)
         $expectedContent = "Hello world"
 
         # Root domain
@@ -85,7 +85,12 @@ Describe "Integration Tests" {
     # SSL Certificate has been issued
     Context "When an SSL Certificate has been issued for: [$env:DNS_DOMAIN_NAME]" {
 
-        # Assign expected Issuer name
+        # Vars
+        $hostname = $env:DNS_DOMAIN_NAME
+        $port = 443
+        # Number of days out to warn about certificate expiration
+        $warningThreshold = 14
+
         switch ($env:CERT_API_ENVIRONMENT) {
             prod { $expectedIssuerName = "Let's Encrypt Authority" }
             staging { $expectedIssuerName = "Fake LE Intermediate" }
@@ -93,12 +98,24 @@ Describe "Integration Tests" {
         }
 
         # Get cert
-        . ../scripts/Get-CertInfo.ps1
-        $cert = Get-CertInfo -Hostname $env:DNS_DOMAIN_NAME -Port 443
+        . ../scripts/Test-SslProtocol.ps1
+        $sslResult = Test-SslProtocol -ComputerName $hostname -Port $port
 
         # Tests
-        It "The [$env:CERT_API_ENVIRONMENT] SSL cert for [$env:DNS_DOMAIN_NAME] should be issued by: [$expectedIssuerName]" {
-            $cert.Issuer -match $expectedIssuerName | Should Be $true
+        It "Should have a [$env:CERT_API_ENVIRONMENT] SSL cert for [$hostname] issued by: [$expectedIssuerName]" {
+            $sslResult.Certificate.Issuer -match $expectedIssuerName | Should Be $true
+        }
+
+        It "Should have Signature Algorithm of [sha256RSA]" {
+            $sslResult.SignatureAlgorithm.FriendlyName | Should Be "sha256RSA"
+        }
+
+        It "Should support TLS1.2" {
+            $sslResult.TLS12 | Should Be $True
+        }
+
+        It "Should not expire within [$warningThreshold] days" {
+            ($sslResult.Certificate.NotAfter -gt (Get-Date).AddDays($warningThreshold)) | Should Be $True
         }
     }
 }
