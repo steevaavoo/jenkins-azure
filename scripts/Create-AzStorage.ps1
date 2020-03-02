@@ -1,5 +1,8 @@
 # This will create an Azure resource group, Storage account and Storage container, used to store terraform remote state
 
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 # Resource Group
 Write-Output "`nSTARTED: Creating Resource Group..."
 az group create --location $env:LOCATION --name $env:TERRAFORM_STORAGE_RG

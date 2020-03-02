@@ -39,7 +39,7 @@ Describe "Integration Tests" {
         }
 
         It "Container Repository [$env:CONTAINER_IMAGE_NAME] should exist" {
-            az acr repository show --name $env:ACR_NAME --image $env:CONTAINER_IMAGE_TAG_FULL --query "name" -o tsv | Should be "latest"
+            az acr repository show --name $env:ACR_NAME --image $env:CONTAINER_IMAGE_TAG_FULL --query "name" -o tsv | Should be $env:CONTAINER_IMAGE_TAG
         }
     }
 
@@ -58,9 +58,77 @@ Describe "Integration Tests" {
     # DNS record updated
     Context "When DNS record has been updated for: [$env:DNS_DOMAIN_NAME]" {
 
-        $testUrl = "http://$($env:DNS_DOMAIN_NAME):8080"
-        It "Resource Group [$testUrl] should return: [Hello world]" {
-            curl $testUrl | Should be "Hello world"
+        # Vars
+        $testUrl = "https://$($env:DNS_DOMAIN_NAME)"
+        $testUrlNodeApp = "$($testUrl)/helloworld"
+        $allowedStatusCodes = @(200, 304)
+        $expectedContent = "Hello world"
+
+        # Root domain
+        It "A request to [$testUrl] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
+            $responseStatusCode = curl -k -s -o /dev/null -w "%{http_code}" $testUrl
+            $responseStatusCode | Should BeIn $allowedStatusCodes
+        }
+
+        # nodeapp
+        It "A request to [$testUrlNodeApp] should return an allowed Status Code: [$($allowedStatusCodes -join ', ')]" {
+            $responseStatusCode = curl -k -s -o /dev/null -w "%{http_code}" $testUrl
+            $responseStatusCode | Should BeIn $allowedStatusCodes
+        }
+
+        It "A request to [$testUrlNodeApp] should include [$expectedContent] in the returned content" {
+            curl -k -s $testUrlNodeApp | Should be $expectedContent
+        }
+    }
+
+
+    # SSL Certificate has been issued
+    Context "When an SSL Certificate has been issued for: [$env:DNS_DOMAIN_NAME]" {
+
+        # Vars
+        $hostname = $env:DNS_DOMAIN_NAME
+        $port = 443
+        # Number of days out to warn about certificate expiration
+        $warningThreshold = 14
+
+        switch ($env:CERT_API_ENVIRONMENT) {
+            prod { $expectedIssuerName = "Let's Encrypt Authority" }
+            staging { $expectedIssuerName = "Fake LE Intermediate" }
+            Default { $expectedIssuerName = "NOT DEFINED" }
+        }
+
+        # Get common cert info
+        . ../scripts/Get-CertInfo.ps1
+        $certResult = Get-CertInfo -ComputerName $hostname -Port $port
+
+        # DEBUG Output
+        if ($env:CI_DEBUG -eq "true") { $certResult | Out-String | Write-Verbose }
+
+        # Tests
+        It "Should have a [$env:CERT_API_ENVIRONMENT] SSL cert for [$hostname] issued by: [$expectedIssuerName]" {
+            $certResult.Issuer -match $expectedIssuerName | Should Be $true
+        }
+
+        # Do extra supported tests if on Windows OS
+        if ($IsWindows) {
+            # Get cert
+            . ../scripts/Test-SslProtocol.ps1
+            $sslResult = Test-SslProtocol -ComputerName $hostname -Port $port
+
+            # DEBUG Output
+            if ($env:CI_DEBUG -eq "true") { $sslResult | Out-String | Write-Verbose }
+
+            It "Should have Signature Algorithm of [sha256RSA]" {
+                $sslResult.SignatureAlgorithm | Should Be "sha256RSA"
+            }
+
+            It "Should support TLS1.2" {
+                $sslResult.TLS12 | Should Be $True
+            }
+
+            It "Should not expire within [$warningThreshold] days" {
+                ($sslResult.Certificate.NotAfter -gt (Get-Date).AddDays($warningThreshold)) | Should Be $True
+            }
         }
     }
 }

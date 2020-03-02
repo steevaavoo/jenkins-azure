@@ -17,6 +17,9 @@ param (
     $RetryIntervalSeconds = 10
 )
 
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 # Merge AKS cluster details into ~\.kube\config
 $importAzAksCredentialSplat = @{
     ResourceGroupName = $AksResourceGroupName

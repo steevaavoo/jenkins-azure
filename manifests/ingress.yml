@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: ingress-tls
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: letsencrypt-__CERT_API_ENVIRONMENT__
+spec:
+  tls:
+  - hosts:
+    - aks.thehypepipe.co.uk
+    secretName: tls-secret
+  rules:
+  - host: aks.thehypepipe.co.uk
+    http:
+      paths:
+      - backend:
+          serviceName: azure-vote-front
+          servicePort: 80
+        path: /(.*)
+      - backend:
+          serviceName: nodeapp
+          servicePort: 80
+        path: /helloworld(/|$)(.*)
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-static
+  namespace: ingress-tls
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /static/$2
+    cert-manager.io/cluster-issuer: letsencrypt-__CERT_API_ENVIRONMENT__
+spec:
+  tls:
+  - hosts:
+    - aks.thehypepipe.co.uk
+    secretName: tls-secret
+  rules:
+  - host: aks.thehypepipe.co.uk
+    http:
+      paths:
+      - backend:
+          serviceName: azure-vote-front
+          servicePort: 80
+        path: /static(/|$)(.*)

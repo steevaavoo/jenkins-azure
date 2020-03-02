@@ -23,10 +23,34 @@
 - [x] Add improved output to all scripts, esp. az cli scripts with no current output (`Destroy-Storage.ps1`)
 - [x] Add [`az acr build`](https://docs.microsoft.com/en-us/cli/azure/acr?view=azure-cli-latest#az-acr-build) step - instead of local docker build / push
 - [x] Add Pester tests with junit output
-- [ ] Add clock example node app instead of a one sentence website: https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
-- [ ] Add Terraform diff summary within input prompt (single line summary, or one line per resource)
-- [ ] Add dynamic check to skip Docker build stage if image tag hasn't changed
-- [ ] Add Helm for Kubernetes releases
+- [x] Add dynamic check to skip Docker build stage if image tag hasn't changed
+- [x] Fix ingress rules
+- [x] Add Helm for Kubernetes releases
+- [x] Add TLS ingress to support HTTPS certs using LetsEncrypt service
+- [x] Add AKS autoscaling (1-3 nodes)
+- [x] Enable Kubernetes dashboard
+- [x] Ensure all resource names adhere to Azure naming conventions:  
+  https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging
+- [x] Add SSH key creation and outputs
+- [x] Add `$ErrorActionPreference = "Stop"` to every PowerShell script
+- [x] Add Terraform diff summary within input prompt (single line summary)
+- [x] Add Terraform diff summary details within input prompt (one line per resource)
+- [x] Add support for DNS subdomains, eg `aks.thehypepipe.co.uk`
+- [x] Troubleshoot `Waiting for CertificateRequest "tls-secret-1881013061" to complete`
+- [x] Add boolean param to switch between staging and prod LetsEncrypt SSL cert issuer services:  
+  https://letsencrypt.org/docs/staging-environment/
+- [x] Add integration test to check staging cert is issued by `Fake LE Intermediate` server
+- [x] Troubleshoot `Connection refused 172.17.0.3:0` in cert test
+- [x] Add integration test to check prod cert is issued by `Let's Encrypt Authority` server
+- [x] Link CI_DEBUG param to verbose messaging. When CI_DEBUG is false, minimal output should show in logs
+- [ ] Add clock (or another better) example node app instead of a one sentence website:  
+  https://github.com/jaydestro/react-clock-basic (can test website headers, and/or datetime present)
+- [ ] Add a StatefulSet app example (research below):  
+  - https://velero.io/blog/velero-v1-1-stateful-backup-vsphere/
+  - https://github.com/helm/charts/tree/master/stable/wordpress
+  - https://aksworkshop.io/
+- [ ] Add Velero backup (after adding StatefulSet example)
+- [ ] Fix `Replace-Tokens.ps1` adding blank lines to YAML files
 - [ ] Complete this README with proper usage instructions
 
 ```powershell

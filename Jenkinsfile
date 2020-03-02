@@ -3,35 +3,44 @@ pipeline {
   // triggers { pollSCM('* * * * *') } // Poll every minute
 
   parameters {
+    string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a 4 character prefix to ensure globally unique resource names', trim: true
+    string       name: 'EMAIL_ADDRESS', defaultValue: 'admin@domain.com', description: 'Enter an email address used for SSL cert info', trim: true
+    choice       name: 'DNS_DOMAIN_NAME', choices: ['aks.thehypepipe.co.uk', 'aks.bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
+    choice       name: 'CERT_API_ENVIRONMENT', choices: ['staging', 'prod'], description: 'Select which SSL cert API environment is used.'
+    booleanParam name: 'HAS_SUBDOMAIN', defaultValue: true, description: 'Tick if using a subdomain (true), or untick if just base domain name used (false).'
+    choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
+    booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
     booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
     booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
-    booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
+    booleanParam name: 'FORCE_CONTAINER_BUILD', defaultValue: false, description: 'Forces ACR container build (true) or skips (false) when tag already exists.'
     booleanParam name: 'FORCE_TEST_FAIL', defaultValue: false, description: 'Triggers failing tests (true), or normal tests (false).'
   }
 
   agent {
       docker {
-          image 'adamrushuk/psjenkinsagent:latest'
-          //label 'my-defined-label'
+          image "${DOCKER_REPO}/psjenkinsagent:2020-02-21"
+          // label 'jenkins-agent' // use a label to target pre-configured agents
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
       }
   }
 
+  // Ensure Azure naming conventions are used, with globally unique names as required
+  // source: https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#sample-naming-convention
   environment {
     ACR_FQDN = "${ACR_NAME}.azurecr.io"
-    ACR_NAME = 'stvcontreg1'
-    AKS_CLUSTER_NAME = 'stvaks1'
+    ACR_NAME = "${PREFIX}acr001${LOCATION}001" // alpha numeric characters only
+    AKS_CLUSTER_NAME = "${PREFIX}-aks-001"
     AKS_IMAGE = "${ACR_FQDN}/${CONTAINER_IMAGE_TAG_FULL}"
-    AKS_RG_NAME = 'aks-rg'
+    AKS_RG_NAME = "${PREFIX}-rg-aks-dev-001"
     CLIENTID = 'http://tfm-k8s-spn'
     CONTAINER_IMAGE_NAME = 'nodeapp'
-    CONTAINER_IMAGE_TAG = 'latest'
+    CONTAINER_IMAGE_TAG = '2020-02-19'
     CONTAINER_IMAGE_TAG_FULL = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
-    DNS_DOMAIN_NAME = 'thehypepipe.co.uk'
-    LOCATION = 'eastus'
+    // DNS_DOMAIN_NAME = "${DNS_DOMAIN_NAME}"
+    LOCATION = 'uksouth'
     //STORAGE_KEY = 'env var set by Get-StorageKey.ps1'
-    TERRAFORM_STORAGE_ACCOUNT = 'terraformstoragestvfff79'
-    TERRAFORM_STORAGE_RG = 'terraform-rg'
+    TERRAFORM_STORAGE_ACCOUNT = "${PREFIX}sttfstate${LOCATION}001"
+    TERRAFORM_STORAGE_RG = "${PREFIX}-rg-tfstate-dev-001"
   }
 
   options {
@@ -56,7 +65,7 @@ pipeline {
       }
     }
 
-    stage('Build') {
+    stage('Terraform') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       options {
         // Timeout for whole Stage
@@ -78,14 +87,17 @@ pipeline {
           // bash: $TF_CHANGES_EXIST
           if (env.TF_CHANGES_EXIST == "True") {
 
-            //   "activity" param doesn't work as expected, so not currently using
-            //   Use "activity: true" to timeout after inactivity
-            //   Use "activity: false" to continue after inactivity
+            // Get summary text
+            tf_changes_summary=pwsh(script: './scripts/Get-TFPlanSummary.ps1', returnStdout: true).trim()
+
+            //  "activity" param doesn't work as expected, so not currently using
+            //  Use "activity: true" to timeout after inactivity
+            //  Use "activity: false" to continue after inactivity
             timeout(activity: false, time: 5) {
-              // TODO: Add TF diff summmary to input prompt?
-              input 'Changes found in TF plan. Continue Terraform Apply?'
-              pwsh(script: './scripts/Apply-Terraform.ps1')
+              input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
             }
+
+            pwsh(script: './scripts/Apply-Terraform.ps1')
 
           } else {
             echo "SKIPPING: Terraform apply - no changes"
@@ -94,7 +106,7 @@ pipeline {
       }
     }
 
-    stage('Docker') {
+    stage('Build-Docker') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
         pwsh(script: './scripts/Build-DockerImage.ps1')
@@ -104,15 +116,17 @@ pipeline {
     stage('Deploy-Kubernetes') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
+        pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
+        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -HasSubDomainName:\$${HAS_SUBDOMAIN} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
+        pwsh(script: './scripts/Deploy-Cert-Manager.ps1')
         pwsh(script: './scripts/Deploy-Manifests.ps1')
-        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
       }
     }
 
     stage('Test') {
       when {not { expression { params.TERRAFORM_DELETE} }}
       steps {
-        pwsh(script: './scripts/test.ps1')
+        pwsh(script: './scripts/Start-Test.ps1')
       }
     }
 

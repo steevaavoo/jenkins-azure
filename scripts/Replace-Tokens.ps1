@@ -5,6 +5,9 @@ param (
     $tokenSuffix = '__'
 )
 
+# Ensure any errors fail the build
+$ErrorActionPreference = "Stop"
+
 $message = "Replacing tokens in Environment variables"
 Write-Output "`nSTARTED: $message..."
 

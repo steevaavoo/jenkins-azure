@@ -20,31 +20,37 @@ param (
     $TimeoutSeconds = 1800, # 1800s = 30 mins
     $RetryIntervalSeconds = 10,
     $DomainName,
+    [switch]$HasSubDomainName,
+    $RecordName = "@",
     $ApiKey,
     $ApiSecret,
-    $Ttl = 600,
-    $ServiceName = 'nodeapp'
+    $Ttl = 600, # in seconds
+    $ServiceLabel = 'app=nginx-ingress',
+    $NameSpace = 'ingress-tls'
 )
 
+# Ensure verbose messages are output
+$VerbosePreference = "Continue"
+# Ensure any errors fail the build
 $ErrorActionPreference = "Stop"
 
 # Setting k8s current context
 $message = "Getting AKS credentials"
-Write-Output "`nSTARTED: $message..."
+Write-Verbose "`nSTARTED: $message..."
 az aks get-credentials --resource-group $env:AKS_RG_NAME --name $env:AKS_CLUSTER_NAME --overwrite-existing
-Write-Output "FINISHED: $message."
+Write-Verbose "FINISHED: $message.`n"
 
 # Wait for Loadbalancer IP to exist
 $timer = [Diagnostics.Stopwatch]::StartNew()
 
-while (-not ($IPAddress = kubectl get svc $ServiceName --ignore-not-found -o jsonpath="{.status.loadBalancer.ingress[0].ip}")) {
+while (-not ($IPAddress = kubectl get service -l $ServiceLabel --namespace $NameSpace --ignore-not-found -o jsonpath="{.items[0].status.loadBalancer.ingress[0].ip}")) {
 
     if ($timer.Elapsed.TotalSeconds -gt $TimeoutSeconds) {
-        Write-Host "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
+        Write-Verbose "Elapsed task time of [$($timer.Elapsed.TotalSeconds)] has exceeded timeout of [$TimeoutSeconds]"
         exit 1
     } else {
-        Write-Host "Current Loadbalancer IP value: [$IPAddress]"
-        Write-Host "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
+        Write-Verbose "Current Loadbalancer IP value: [$IPAddress]"
+        Write-Verbose "Still creating LoadBalancer IP... [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s elapsed]"
         Start-Sleep -Seconds $RetryIntervalSeconds
     }
 }
@@ -52,34 +58,48 @@ while (-not ($IPAddress = kubectl get svc $ServiceName --ignore-not-found -o jso
 $timer.Stop()
 
 # Update pipeline variable
-Write-Host "Creation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
-Write-Host "Found IP [$IPAddress]"
+Write-Verbose "`nCreation complete after [$($timer.Elapsed.Minutes)m$($timer.Elapsed.Seconds)s]"
+Write-Verbose "Found IP [$IPAddress]"
+
+
+
+#region DNS
+# Split subdomain
+if ($HasSubDomainName.IsPresent) {
+    Write-Verbose "HasSubDomainName switch selected..."
+    $DomainNameSplit = $DomainName -split "\."
+    $RecordName = $DomainNameSplit[0]
+    $DomainName = $DomainNameSplit[1..($DomainNameSplit.Count)] -join "."
+
+    Write-Verbose "Selected SubDomain: [$RecordName]"
+    Write-Verbose "Selected Domain: [$DomainName]"
+}
 
 # Init
 $message = "Installing GoDaddy PowerShell module"
-Write-Output "`nSTARTED: $message..."
+Write-Verbose "`nSTARTED: $message..."
 Install-Module -Name "Trackyon.GoDaddy"-Scope "CurrentUser" -Force
-Write-Output "FINISHED: $message."
+Write-Verbose "FINISHED: $message."
 
+# API Creds
 $apiCredential = [pscredential]::new($ApiKey, (ConvertTo-SecureString -String $ApiSecret -AsPlainText -Force))
 
-
 $message = "Getting current domain information"
-Write-Output "`nSTARTED: $message..."
+Write-Verbose "`nSTARTED: $message..."
 
 # Output Domain
-Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
+Get-GDDomain -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
 
 # Output current records
-Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
-Write-Output "FINISHED: $message."
-
+Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
+Write-Verbose "FINISHED: $message."
 
 # Update A record
 $message = "Updating domain [$DomainName] with IP Address [$IPAddress]"
-Write-Host "STARTED: $message"
-Set-GDDomainRecord -credentials $apiCredential -domain $DomainName -name '@' -ipaddress $IPAddress -type "A" -ttl $Ttl -Force
-Write-Host "FINISHED: $message"
+Write-Verbose "STARTED: $message"
+Set-GDDomainRecord -credentials $apiCredential -domain $DomainName -name $RecordName -ipaddress $IPAddress -type "A" -ttl $Ttl -Force
+Write-Verbose "FINISHED: $message"
 
 # Output updated records
-Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Output
+Get-GDDomainRecord -credentials $apiCredential -domain $DomainName | Out-String | Write-Verbose
+#endregion DNS
