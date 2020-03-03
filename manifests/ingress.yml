@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - aks.thehypepipe.co.uk
+    - __DNS_DOMAIN_NAME__
     secretName: tls-secret
   rules:
-  - host: aks.thehypepipe.co.uk
+  - host: __DNS_DOMAIN_NAME__
     http:
       paths:
       - backend:
@@ -37,10 +37,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - aks.thehypepipe.co.uk
+    - __DNS_DOMAIN_NAME__
     secretName: tls-secret
   rules:
-  - host: aks.thehypepipe.co.uk
+  - host: __DNS_DOMAIN_NAME__
     http:
       paths:
       - backend:
