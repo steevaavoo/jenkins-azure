@@ -12,12 +12,15 @@
   - [Backup](#backup)
     - [NGINX example (without PersistentVolumes)](#nginx-example-without-persistentvolumes)
     - [NGINX example (with PersistentVolumes)](#nginx-example-with-persistentvolumes)
+    - [Nexus example (with PersistentVolumes)](#nexus-example-with-persistentvolumes)
   - [Troubleshooting](#troubleshooting)
   - [Cleanup](#cleanup)
 
 ## TODO
 
-- [ ] Complete test backup / restore
+- [x] Complete test backup / restore
+- [x] Test Velero Server install using CLI
+- [ ] Troubleshoot why Velero looks in wrong AKS resource group for disks to backup
 - [ ] Test Velero Server install using Helm
 - [ ] Configure and test Restic for AzureFile backup support: https://velero.io/docs/v1.2.0/restic/
 
@@ -27,11 +30,20 @@
 
 ```powershell
 # Vars
+$prefix = ""
+$aksClusterName = "$($prefix)-aks-ar"
+$aksClusterResourceGroupName = "$($prefix)-rg"
 $location = "uksouth"
-$backupResourceGroupName = "ruba-rg-bck"
-$snapshotResourceGroupName = "ruba-rg-snap"
-$storageAccountName = "rubastbckuksouth001"
+$backupResourceGroupName = "$($prefix)-rg-bck"
+$snapshotResourceGroupName = "$($prefix)-rg-snap"
+$storageAccountName = "$($prefix)stbckuksouth001"
 $blobContainerName = "velero"
+
+# Downloading latest credentials for AKS Cluster
+az aks get-credentials --resource-group $aksClusterResourceGroupName --name $aksClusterName --overwrite-existing
+
+# [OPTIONAL] View AKS Dashboard
+az aks browse --resource-group $aksClusterResourceGroupName --name $aksClusterName
 
 # Create Resource Groups
 az group create --name $backupResourceGroupName --location $location
@@ -85,7 +97,6 @@ kubectl create namespace velero
 velero install -h
 
 # Install
-# TODO: add separate snapshot resource group
 velero install `
     --provider azure `
     --plugins velero/velero-plugin-for-microsoft-azure:v1.0.0 `
@@ -93,7 +104,8 @@ velero install `
     --secret-file ./velero/credentials-velero `
     --backup-location-config resourceGroup=$backupResourceGroupName,storageAccount=$storageAccountName `
     --snapshot-location-config apiTimeout=5m,resourceGroup=$snapshotResourceGroupName `
-    --v=3
+    --v=3 `
+    --dry-run
 
 # Monitor deployment progress
 kubectl get all -n velero
@@ -200,7 +212,6 @@ velero backup logs nginx-pv-backup
 kubectl get ns
 kubectl get all,pvc,pv -n nginx-pv
 kubectl delete namespace nginx-pv
-kubectl delete namespace nginx-pv
 # Wait for the namespace to be deleted
 kubectl get ns
 kubectl get all,pvc,pv -n nginx-pv
@@ -215,7 +226,7 @@ velero restore create --from-backup nginx-pv-backup
 
 # Check restore
 velero restore describe
-velero restore logs nginx-pv-backup-20200226231755
+velero restore logs nginx-pv-backup-TODO
 
 # Monitor restore progress
 kubectl get ns
@@ -230,6 +241,69 @@ kubectl get deployment -n nginx-pv --watch
 kubectl get svc -n nginx-pv -w
 $newUrlPv = kubectl get svc my-nginx-pv -n nginx-pv --ignore-not-found -o jsonpath="http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}"
 Write-Output "Browse to new NGINX URL: $newUrlPv"
+```
+
+### Nexus example (with PersistentVolumes)
+
+```powershell
+# Monitor deployment progress
+kubectl get all,pvc,pv -n nexus-custom
+kubectl describe pod -n nexus-custom
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace nexus-custom
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace nexus-custom --watch
+kubectl get sts -n nexus-custom --watch
+kubectl logs statefulset.apps/nexus -n nexus-custom -f --all-containers --since 20m
+
+# Check resources and wait for EXTERNAL-IP
+kubectl get all,pvc,pv -n nexus-custom
+kubectl get svc -n nexus-custom -w
+
+# Open browser
+$url = kubectl get svc -n nexus-custom --ignore-not-found -o jsonpath="http://{.items[0].status.loadBalancer.ingress[0].ip}:{.items[0].spec.ports[0].port}/#browse/browse:nuget-hosted"
+Write-Output "Browse to URL: $url"
+
+# Create a backup
+velero backup create nexus-pv-backup --include-namespaces nexus-custom
+
+# Check backup
+velero backup describe nexus-pv-backup
+velero backup describe nexus-pv-backup --details
+velero backup logs nexus-pv-backup
+velero backup logs nexus-pv-backup | sls "error"
+
+# Simulate a disaster
+kubectl get ns
+kubectl get all,pvc,pv -n nexus-custom
+kubectl delete namespace nexus-custom
+# Wait for the namespace to be deleted
+kubectl get ns
+kubectl get all,pvc,pv -n nexus-custom
+# pv shows as failed
+kubectl describe pv -n nexus-custom
+# pv may be deleted, but can delete ourselves
+kubectl delete pv -n nexus-custom
+kubectl delete persistentvolume/pvc-TODO -n nexus-custom
+
+# Restore your lost resources
+velero restore create --from-backup nexus-pv-backup
+
+# Check restore
+velero restore describe
+velero restore logs nexus-pv-backup-TODO
+
+# Monitor restore progress
+kubectl get ns
+kubectl get all,pvc,pv -n nexus-custom
+kubectl describe pod -n nexus-custom
+kubectl get events --sort-by=.metadata.creationTimestamp --namespace nexus-custom
+kubectl get sts -n nexus-custom --watch
+# kubectl logs sts -n nexus-custom -f --all-containers --since 20m
+
+# Check resources and wait for EXTERNAL-IP
+kubectl get svc -n nexus-custom -w
+# Open browser
+$url = kubectl get svc -n nexus-custom --ignore-not-found -o jsonpath="http://{.items[0].status.loadBalancer.ingress[0].ip}:{.items[0].spec.ports[0].port}/#browse/browse:nuget-hosted"
+Write-Output "Browse to URL: $url"
 ```
 
 ## Troubleshooting
