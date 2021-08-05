@@ -5,7 +5,7 @@ docker-machine start
 # Load env vars for docker cli
 # may need to wait a minute after starting docker-machine vm
 & docker-machine env --shell powershell default | Invoke-Expression
-gci env:DOCKER*
+Get-ChildItem env:DOCKER*
 
 # Open http://localhost:8080
 # for docker-machine, use IP shown from "docker-machine ip"
@@ -125,9 +125,9 @@ kubectl config set-context --current --namespace=ingress-tls
 # See what's running
 kubectl get node
 kubectl get ns
-kubectl get svc,ingress
-kubectl get all,pv,pvc
-kubectl get all,pv,pvc -o wide
+kubectl get svc, ingress
+kubectl get all, pv, pvc
+kubectl get all, pv, pvc -o wide
 
 # Custom Storage Class
 # Show default yaml
@@ -140,7 +140,7 @@ https://docs.microsoft.com/en-us/azure/aks/concepts-storage#storage-classes
 kubectl apply --validate -f ./manifests/azure-vote.yml
 
 # Check
-kubectl get sc,pvc,pv,all
+kubectl get sc, pvc, pv, all
 kubectl get events --sort-by=.metadata.creationTimestamp -w
 $podName = kubectl get pod -l app=azure-vote-front -o jsonpath="{.items[0].metadata.name}"
 $podName = kubectl get pod -l app=azure-vote-back -o jsonpath="{.items[0].metadata.name}"
@@ -192,11 +192,11 @@ helm list --all-namespaces
 
 helm status cert-manager
 
-kubectl get all,ing
+kubectl get all, ing
 
 # Show secrets Helm uses to track release info
 # sls is like grep for PowerShell
-kubectl get secret | sls "NAME|helm.sh/release.v1"
+kubectl get secret | Select-String "NAME|helm.sh/release.v1"
 #endregion Helm
 
 
@@ -210,12 +210,12 @@ choco install -y curl
 curl -h
 
 # Common options
--I, --head          Show document info only
--i, --include       Include protocol response headers in the output
--k, --insecure      Allow insecure server connections when using SSL
--L, --location      Follow redirects
--s, --silent        Silent mode
--v, --verbose       Make the operation more talkative
+# -I, --head          Show document info only
+# -i, --include       Include protocol response headers in the output
+# -k, --insecure      Allow insecure server connections when using SSL
+# -L, --location      Follow redirects
+# -s, --silent        Silent mode
+# -v, --verbose       Make the operation more talkative
 
 # Test ingress
 # curl -kivL -H 'Host: <HostUsedWithinIngressConfig>' 'http://<LoadBalancerExternalIp>'
@@ -244,7 +244,7 @@ https://www.ssllabs.com/ssltest/analyze.html?d=aks.thehypepipe.co.uk
 
 # openssl s_client -connect host:port -status
 # openssl s_client -connect host:port -status [-showcerts]
-openssl s_client -connect aks.thehypepipe.co.uk:443 | sls "CN =|error"
+openssl s_client -connect aks.thehypepipe.co.uk:443 | Select-String "CN =|error"
 openssl s_client -connect aks.thehypepipe.co.uk:443 -status -showcerts
 openssl s_client -connect aks.thehypepipe.co.uk:443 -status
 
@@ -296,19 +296,19 @@ $env:KUBE_EDITOR = 'code --wait'
 kubectl edit deploy nginx-ingress-controller
 
 # Add --v=X to "- args", where X is an integer
---v=2 shows details using diff about the changes in the configuration in nginx
---v=3 shows details about the service, Ingress rule, endpoint changes and it dumps the nginx configuration in JSON format
---v=5 configures NGINX in debug mode
+# --v=2 shows details using diff about the changes in the configuration in nginx
+# --v=3 shows details about the service, Ingress rule, endpoint changes and it dumps the nginx configuration in JSON format
+# --v=5 configures NGINX in debug mode
 
 
 
 # Debugging cert-manager
 # Show all resource types
 kubectl api-resources
-kubectl api-resources | sls "cert-manager.io"
+kubectl api-resources | Select-String "cert-manager.io"
 
 # Show cert-manager resources
-kubectl get challenges,orders,certificaterequests,certificates,clusterissuers,issuers -A
+kubectl get challenges, orders, certificaterequests, certificates, clusterissuers, issuers -A
 kubectl get challenges -A -o wide
 kubectl get orders -A -o wide
 kubectl get certificaterequests -A -o wide
@@ -346,7 +346,7 @@ nslookup aks.thehypepipe.co.uk
 # TODO WIP
 # Main issue in initial Jenkins build when running:
 # "kubectl apply -f ./manifests/cluster-issuer.yml --namespace ingress-tls"
-[2020-02-22T12:58:13.628Z] Error from server (InternalError): error when creating "./manifests/cluster-issuer.yml": Internal error occurred: failed calling webhook "webhook.cert-manager.io": Post https://cert-manager-webhook.ingress-tls.svc:443/mutate?timeout=30s: dial tcp 10.0.171.89:443: connect: connection refused
+# [2020-02-22T12:58:13.628Z] Error from server (InternalError): error when creating "./manifests/cluster-issuer.yml": Internal error occurred: failed calling webhook "webhook.cert-manager.io": Post https://cert-manager-webhook.ingress-tls.svc:443/mutate?timeout=30s: dial tcp 10.0.171.89:443: connect: connection refused
 
 # Works second attempt
 clusterissuer.cert-manager.io/letsencrypt configured
@@ -364,7 +364,7 @@ kubectl get issuers.cert-manager.io -A
 
 # Check webhook api
 kubectl get apiservice v1beta1.webhook.certmanager.k8s.io
-kubectl get apiservice | sls "webhook"
+kubectl get apiservice | Select-String "webhook"
 
 
 # Check ClusterIssuer is READY
@@ -400,7 +400,7 @@ kubectl describe ingress
 
 #region Cleanup
 kubectl get ns
-kubectl get all,configmap,pv,pvc --namespace ingress-tls
+kubectl get all, configmap, pv, pvc --namespace ingress-tls
 helm list --namespace ingress-tls
 
 kubectl delete namespace ingress-tls

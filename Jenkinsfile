@@ -21,6 +21,8 @@ pipeline {
           image "${DOCKER_REPO}/psjenkinsagent:2020-02-21"
           // label 'jenkins-agent' // use a label to target pre-configured agents
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
+          // above maps the socket of the Docker-in-Docker container to the local container to facilitate
+          // communitacion with the running Docker daemon on the "host" container
       }
   }
 
