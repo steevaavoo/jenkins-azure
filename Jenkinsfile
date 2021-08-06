@@ -5,10 +5,10 @@ pipeline {
   parameters {
     string       name: 'PREFIX', defaultValue: 'ruba', description: 'Choose a 4 character prefix to ensure globally unique resource names', trim: true
     string       name: 'EMAIL_ADDRESS', defaultValue: 'admin@domain.com', description: 'Enter an email address used for SSL cert info', trim: true
-    choice       name: 'DNS_DOMAIN_NAME', choices: ['aks.thehypepipe.co.uk', 'aks.bakers-foundry.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
+    choice       name: 'DNS_DOMAIN_NAME', choices: ['aks.bakers-foundry.co.uk', 'aks.thehypepipe.co.uk'], description: 'Selecting between Adam\'s and Steve\'s Domain Names for collaborative builds.'
     choice       name: 'CERT_API_ENVIRONMENT', choices: ['staging', 'prod'], description: 'Select which SSL cert API environment is used.'
     booleanParam name: 'HAS_SUBDOMAIN', defaultValue: true, description: 'Tick if using a subdomain (true), or untick if just base domain name used (false).'
-    choice       name: 'DOCKER_REPO',choices: ['adamrushuk', 'steevaavoo'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
+    choice       name: 'DOCKER_REPO',choices: ['steevaavoo', 'adamrushuk'], description: 'Selecting between Adam\'s and Steve\'s Docker Repositories for collaborative builds.'
     booleanParam name: 'CI_DEBUG', defaultValue: false, description: 'Enables debug logs (true), or skips (false).'
     booleanParam name: 'STORAGE_DELETE', defaultValue: false, description: 'Also Destroy Storage (true), or skip (false).'
     booleanParam name: 'TERRAFORM_DELETE', defaultValue: false, description: 'Run Terraform Delete (true), or skip (false).'
@@ -18,7 +18,7 @@ pipeline {
 
   agent {
       docker {
-          image "${DOCKER_REPO}/psjenkinsagent:2020-02-21"
+          image "${DOCKER_REPO}/psjenkinsagent:latest"
           // label 'jenkins-agent' // use a label to target pre-configured agents
           args  '-v /var/run/docker.sock:/var/run/docker.sock'
           // above maps the socket of the Docker-in-Docker container to the local container to facilitate
