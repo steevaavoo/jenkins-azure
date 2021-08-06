@@ -1,21 +1,21 @@
-FROM mcr.microsoft.com/powershell:6.2.3-centos-7
+FROM mcr.microsoft.com/powershell:lts-centos-7
 
 # Versions
-ENV TERRAFORM_VERSION=0.12.20
+ENV TERRAFORM_VERSION=0.12.31
 ENV DOCKER_VERSION=19.03.5
-ENV KUBECTL_VERSION=v1.17.3
-ENV HELM_VERSION=3.1.0
+ENV KUBECTL_VERSION=v1.20.7
+ENV HELM_VERSION=3.6.3
 
 # Metadata as defined at http://label-schema.org
-LABEL maintainer="Adam Rush" \
+LABEL maintainer="Steve Baker" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.name="Jenkins Agent with PowerShell" \
     org.label-schema.license="MIT" \
     org.label-schema.description="A Jenkins Agent with PowerShell, Azure, Terraform, Docker, and Kubernetes CLIs installed." \
-    org.label-schema.url="https://github.com/adamrushuk/jenkins-azure/blob/master/README.md" \
-    org.label-schema.usage="https://github.com/adamrushuk/jenkins-azure/blob/master/README.md" \
-    org.label-schema.vcs-url="https://github.com/adamrushuk/jenkins-azure" \
-    org.label-schema.docker.cmd="docker run --rm -it --name jenkins-agent adamrushuk/psjenkinsagent:latest pwsh"
+    org.label-schema.url="https://github.com/steevaavoo/jenkins-azure/blob/master/README.md" \
+    org.label-schema.usage="https://github.com/steevaavoo/jenkins-azure/blob/master/README.md" \
+    org.label-schema.vcs-url="https://github.com/steevaavoo/jenkins-azure" \
+    org.label-schema.docker.cmd="docker run --rm -it --name jenkins-agent steevaavoo/psjenkinsagent:latest pwsh"
 
 # Install DockerCLI
 RUN docker_url=https://download.docker.com/linux/static/stable/x86_64 && \

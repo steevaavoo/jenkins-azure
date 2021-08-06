@@ -1,14 +1,7 @@
 #region Jenkins blueocean
-# Start Docker Desktop, or Docker-Machine (if using VirtualBox setup)
-docker-machine start
+# Start Docker Desktop
 
-# Load env vars for docker cli
-# may need to wait a minute after starting docker-machine vm
-& docker-machine env --shell powershell default | Invoke-Expression
-Get-ChildItem env:DOCKER*
-
-# Open http://localhost:8080
-# for docker-machine, use IP shown from "docker-machine ip"
+# Open
 # eg: http://192.168.99.104:8080/
 docker run `
     --rm -d `
@@ -32,7 +25,7 @@ Timestamper
 
 # Use BlueOcean to add existing GitHub repo containing a Jenkinsfile
 http://<JenkinsUrl>:8080/blue/create-pipeline
-
+http://localhost:8080/blue/create-pipeline
 # Attach to container into a bash shell
 docker container exec -it jenkins bash
 
@@ -68,7 +61,7 @@ docker container start jenkins
 #region Jenkins Agent
 # https://hub.docker.com/r/adamrushuk/psjenkinsagent
 # Build dated and latest tags
-$dockerUser = "adamrushuk"
+$dockerUser = "steevaavoo"
 Push-Location .\agent
 $tag = (Get-Date -Format "yyyy-MM-dd")
 $dockerImage = "$dockerUser/psjenkinsagent"

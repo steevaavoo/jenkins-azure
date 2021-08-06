@@ -67,95 +67,95 @@ pipeline {
       }
     }
 
-    stage('Terraform') {
-      when {not { expression { params.TERRAFORM_DELETE} }}
-      options {
-        // Timeout for whole Stage
-        timeout(time: 1, unit: 'HOURS')
-      }
-      steps {
-        pwsh(script: './scripts/Plan-Terraform.ps1')
-        script {
-          // Example of a PowerShell script returning a boolean ($true or $false) to an Jenkins env var
-          echo "running Test-TFChangesExist.ps1"
-          // NOTE: Use '$VerbosePreference = "Continue"' in PowerShell script to capture Verbose stream
-          // NOTE: Use '$ErrorActionPreference = "Stop"' in PowerShell script to ensure build stops on errors
-          env.TF_CHANGES_EXIST=pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
-          echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
+    // stage('Terraform') {
+    //   when {not { expression { params.TERRAFORM_DELETE} }}
+    //   options {
+    //     // Timeout for whole Stage
+    //     timeout(time: 1, unit: 'HOURS')
+    //   }
+    //   steps {
+    //     pwsh(script: './scripts/Plan-Terraform.ps1')
+    //     script {
+    //       // Example of a PowerShell script returning a boolean ($true or $false) to an Jenkins env var
+    //       echo "running Test-TFChangesExist.ps1"
+    //       // NOTE: Use '$VerbosePreference = "Continue"' in PowerShell script to capture Verbose stream
+    //       // NOTE: Use '$ErrorActionPreference = "Stop"' in PowerShell script to ensure build stops on errors
+    //       env.TF_CHANGES_EXIST=pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
+    //       echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
 
-          // Evaluate the env var within Jenkins process, or within an external script
-          // Jenkins: env.TF_CHANGES_EXIST
-          // PowerShell: $env:TF_CHANGES_EXIST
-          // bash: $TF_CHANGES_EXIST
-          if (env.TF_CHANGES_EXIST == "True") {
+    //       // Evaluate the env var within Jenkins process, or within an external script
+    //       // Jenkins: env.TF_CHANGES_EXIST
+    //       // PowerShell: $env:TF_CHANGES_EXIST
+    //       // bash: $TF_CHANGES_EXIST
+    //       if (env.TF_CHANGES_EXIST == "True") {
 
-            // Get summary text
-            tf_changes_summary=pwsh(script: './scripts/Get-TFPlanSummary.ps1', returnStdout: true).trim()
+    //         // Get summary text
+    //         tf_changes_summary=pwsh(script: './scripts/Get-TFPlanSummary.ps1', returnStdout: true).trim()
 
-            //  "activity" param doesn't work as expected, so not currently using
-            //  Use "activity: true" to timeout after inactivity
-            //  Use "activity: false" to continue after inactivity
-            timeout(activity: false, time: 5) {
-              input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
-            }
+    //         //  "activity" param doesn't work as expected, so not currently using
+    //         //  Use "activity: true" to timeout after inactivity
+    //         //  Use "activity: false" to continue after inactivity
+    //         timeout(activity: false, time: 5) {
+    //           input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
+    //         }
 
-            pwsh(script: './scripts/Apply-Terraform.ps1')
+    //         pwsh(script: './scripts/Apply-Terraform.ps1')
 
-          } else {
-            echo "SKIPPING: Terraform apply - no changes"
-          }
-        }
-      }
-    }
+    //       } else {
+    //         echo "SKIPPING: Terraform apply - no changes"
+    //       }
+    //     }
+    //   }
+    // }
 
-    stage('Build-Docker') {
-      when {not { expression { params.TERRAFORM_DELETE} }}
-      steps {
-        pwsh(script: './scripts/Build-DockerImage.ps1')
-      }
-    }
+    // stage('Build-Docker') {
+    //   when {not { expression { params.TERRAFORM_DELETE} }}
+    //   steps {
+    //     pwsh(script: './scripts/Build-DockerImage.ps1')
+    //   }
+    // }
 
-    stage('Deploy-Kubernetes') {
-      when {not { expression { params.TERRAFORM_DELETE} }}
-      steps {
-        pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
-        pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -HasSubDomainName:\$${HAS_SUBDOMAIN} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
-        pwsh(script: './scripts/Deploy-Cert-Manager.ps1')
-        pwsh(script: './scripts/Deploy-Manifests.ps1')
-      }
-    }
+    // stage('Deploy-Kubernetes') {
+    //   when {not { expression { params.TERRAFORM_DELETE} }}
+    //   steps {
+    //     pwsh(script: "./scripts/Deploy-Ingress-Controller.ps1")
+    //     pwsh(script: "./scripts/Update-Dns.ps1 -AksResourceGroupName ${AKS_RG_NAME} -AksClusterName ${AKS_CLUSTER_NAME} -DomainName ${DNS_DOMAIN_NAME} -HasSubDomainName:\$${HAS_SUBDOMAIN} -ApiKey ${API_KEY} -ApiSecret ${API_SECRET}")
+    //     pwsh(script: './scripts/Deploy-Cert-Manager.ps1')
+    //     pwsh(script: './scripts/Deploy-Manifests.ps1')
+    //   }
+    // }
 
-    stage('Test') {
-      when {not { expression { params.TERRAFORM_DELETE} }}
-      steps {
-        pwsh(script: './scripts/Start-Test.ps1')
-      }
-    }
+    // stage('Test') {
+    //   when {not { expression { params.TERRAFORM_DELETE} }}
+    //   steps {
+    //     pwsh(script: './scripts/Start-Test.ps1')
+    //   }
+    // }
 
-    stage('Destroy-Terraform') {
-      when { expression { params.TERRAFORM_DELETE} }
-      options { retry(3) }
-      steps {
-        pwsh(script: './scripts/Destroy-Terraform.ps1')
-      }
-    }
+  //   stage('Destroy-Terraform') {
+  //     when { expression { params.TERRAFORM_DELETE} }
+  //     options { retry(3) }
+  //     steps {
+  //       pwsh(script: './scripts/Destroy-Terraform.ps1')
+  //     }
+  //   }
 
-    stage('Destroy-Storage') {
-      when { expression { params.STORAGE_DELETE} }
-      options { retry(3) }
-      steps {
-        pwsh(script: './scripts/Destroy-Storage.ps1')
-      }
-    }
+  //   stage('Destroy-Storage') {
+  //     when { expression { params.STORAGE_DELETE} }
+  //     options { retry(3) }
+  //     steps {
+  //       pwsh(script: './scripts/Destroy-Storage.ps1')
+  //     }
+  //   }
 
   }
 
-  post {
-    always {
-      archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
-      archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
-      junit allowEmptyResults: true, testResults: '**/*-junit.xml'
-    }
+  // post {
+  //   always {
+  //     archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
+  //     archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
+  //     junit allowEmptyResults: true, testResults: '**/*-junit.xml'
+  //   }
     // success {
     // }
     // failure {
