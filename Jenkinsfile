@@ -52,8 +52,8 @@ pipeline {
       // Once that's done, set up an Azure Service Principal credential in Jenkins - paste the info from the Azure
       // App Registration summary. Tenant ID is in Default Directory Overview.
       azureServicePrincipal(credentialsId: 'azure-jenkins', clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID'),
-      string(credentialsId: 'API_KEY', variable: 'API_KEY'),
-      string(credentialsId: 'API_SECRET', variable: 'API_SECRET')
+      // string(credentialsId: 'API_KEY', variable: 'API_KEY'),
+      // string(credentialsId: 'API_SECRET', variable: 'API_SECRET')
     ])
     ansiColor('xterm')
     timestamps()
