@@ -34,7 +34,7 @@ variable "tags" {
 
   default = {
     Env    = "Dev"
-    Owner  = "Adam Rush"
+    Owner  = "Steve Baker"
     Source = "terraform"
   }
 }
