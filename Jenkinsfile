@@ -145,36 +145,36 @@ pipeline {
     //   }
     // }
 
-  //   stage('Destroy-Terraform') {
-  //     when { expression { params.TERRAFORM_DELETE} }
-  //     options { retry(3) }
-  //     steps {
-  //       pwsh(script: './scripts/Destroy-Terraform.ps1')
-  //     }
-  //   }
+    stage('Destroy-Terraform') {
+      when { expression { params.TERRAFORM_DELETE} }
+      options { retry(3) }
+      steps {
+        pwsh(script: './scripts/Destroy-Terraform.ps1')
+      }
+    }
 
-  //   stage('Destroy-Storage') {
-  //     when { expression { params.STORAGE_DELETE} }
-  //     options { retry(3) }
-  //     steps {
-  //       pwsh(script: './scripts/Destroy-Storage.ps1')
-  //     }
-  //   }
+    stage('Destroy-Storage') {
+      when { expression { params.STORAGE_DELETE} }
+      options { retry(3) }
+      steps {
+        pwsh(script: './scripts/Destroy-Storage.ps1')
+      }
+    }
 
   }
 
-  // post {
-  //   always {
-  //     archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
-  //     archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
-  //     junit allowEmptyResults: true, testResults: '**/*-junit.xml'
-  //   }
-    // success {
-    // }
-    // failure {
-    // }
-    // aborted {
-    // }
-  // }
+  post {
+    always {
+      archiveArtifacts allowEmptyArchive: true, artifacts: "**/diff.txt"
+      archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
+      junit allowEmptyResults: true, testResults: '**/*-junit.xml'
+    }
+    success {
+    }
+    failure {
+    }
+    aborted {
+    }
+  }
 
 }
