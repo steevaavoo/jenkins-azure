@@ -65,7 +65,7 @@ variable "azurerm_kubernetes_cluster_name" {
 
 variable "enable_aks_dashboard" {
   description = "Should Kubernetes dashboard be enabled"
-  default     = true
+  default     = false
 }
 
 # Service Principle for AKS
