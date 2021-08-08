@@ -169,12 +169,12 @@ pipeline {
       archiveArtifacts allowEmptyArchive: true, artifacts: '**/*-junit.xml'
       junit allowEmptyResults: true, testResults: '**/*-junit.xml'
     }
-    success {
-    }
-    failure {
-    }
-    aborted {
-    }
+    // success {
+    // }
+    // failure {
+    // }
+    // aborted {
+    // }
   }
 
 }
