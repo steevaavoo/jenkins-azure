@@ -51,6 +51,15 @@ pipeline {
       // choose "Accounts in this organizational directory only (Default Directory only - Single tenant)"
       // Once that's done, set up an Azure Service Principal credential in Jenkins - paste the info from the Azure
       // App Registration summary. Tenant ID is in Default Directory Overview.
+      // This is similar to a service account in Active Directory to which rights, roles and permissions can be assigned.
+      // It's a user account, but with no details, just an ID.
+      // To allow this Service Principal to interact with the Azure Subscription, you need to add permissions in
+      // Subscriptions > [your subscription] > Access Control (IAM) > Role Assignments > + Add
+      // Role = Contributor, Assign access to = User, group or service principal, then select your Service Principal
+      // and Save
+      // azureServicePrincipal denotes the credential type to look for in Jenkins Credential store.
+      // credentialsId is the name we saved it as. clientIdVariable: 'NAME' is assigning that variable a name to which
+      // we will refer inside the called script
       azureServicePrincipal(credentialsId: 'azure-jenkins', clientIdVariable: 'ARM_CLIENT_ID', clientSecretVariable: 'ARM_CLIENT_SECRET', subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID', tenantIdVariable: 'ARM_TENANT_ID'),
       // string(credentialsId: 'API_KEY', variable: 'API_KEY'),
       // string(credentialsId: 'API_SECRET', variable: 'API_SECRET')
@@ -71,46 +80,46 @@ pipeline {
       }
     }
 
-    // stage('Terraform') {
-    //   when {not { expression { params.TERRAFORM_DELETE} }}
-    //   options {
-    //     // Timeout for whole Stage
-    //     timeout(time: 1, unit: 'HOURS')
-    //   }
-    //   steps {
-    //     pwsh(script: './scripts/Plan-Terraform.ps1')
-    //     script {
-    //       // Example of a PowerShell script returning a boolean ($true or $false) to an Jenkins env var
-    //       echo "running Test-TFChangesExist.ps1"
-    //       // NOTE: Use '$VerbosePreference = "Continue"' in PowerShell script to capture Verbose stream
-    //       // NOTE: Use '$ErrorActionPreference = "Stop"' in PowerShell script to ensure build stops on errors
-    //       env.TF_CHANGES_EXIST=pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
-    //       echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
+    stage('Terraform') {
+      when {not { expression { params.TERRAFORM_DELETE} }}
+      options {
+        // Timeout for whole Stage
+        timeout(time: 1, unit: 'HOURS')
+      }
+      steps {
+        pwsh(script: './scripts/Plan-Terraform.ps1')
+        script {
+          // Example of a PowerShell script returning a boolean ($true or $false) to an Jenkins env var
+          echo "running Test-TFChangesExist.ps1"
+          // NOTE: Use '$VerbosePreference = "Continue"' in PowerShell script to capture Verbose stream
+          // NOTE: Use '$ErrorActionPreference = "Stop"' in PowerShell script to ensure build stops on errors
+          env.TF_CHANGES_EXIST=pwsh(script: './scripts/Test-TFChangesExist.ps1', returnStdout: true).trim()
+          echo "TF_CHANGES_EXIST is: ${TF_CHANGES_EXIST}"
 
-    //       // Evaluate the env var within Jenkins process, or within an external script
-    //       // Jenkins: env.TF_CHANGES_EXIST
-    //       // PowerShell: $env:TF_CHANGES_EXIST
-    //       // bash: $TF_CHANGES_EXIST
-    //       if (env.TF_CHANGES_EXIST == "True") {
+          // Evaluate the env var within Jenkins process, or within an external script
+          // Jenkins: env.TF_CHANGES_EXIST
+          // PowerShell: $env:TF_CHANGES_EXIST
+          // bash: $TF_CHANGES_EXIST
+          if (env.TF_CHANGES_EXIST == "True") {
 
-    //         // Get summary text
-    //         tf_changes_summary=pwsh(script: './scripts/Get-TFPlanSummary.ps1', returnStdout: true).trim()
+            // Get summary text
+            tf_changes_summary=pwsh(script: './scripts/Get-TFPlanSummary.ps1', returnStdout: true).trim()
 
-    //         //  "activity" param doesn't work as expected, so not currently using
-    //         //  Use "activity: true" to timeout after inactivity
-    //         //  Use "activity: false" to continue after inactivity
-    //         timeout(activity: false, time: 5) {
-    //           input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
-    //         }
+            //  "activity" param doesn't work as expected, so not currently using
+            //  Use "activity: true" to timeout after inactivity
+            //  Use "activity: false" to continue after inactivity
+            timeout(activity: false, time: 5) {
+              input "Terraform Summary: \n[${tf_changes_summary}]. \n\nContinue Terraform Apply?"
+            }
 
-    //         pwsh(script: './scripts/Apply-Terraform.ps1')
+            pwsh(script: './scripts/Apply-Terraform.ps1')
 
-    //       } else {
-    //         echo "SKIPPING: Terraform apply - no changes"
-    //       }
-    //     }
-    //   }
-    // }
+          } else {
+            echo "SKIPPING: Terraform apply - no changes"
+          }
+        }
+      }
+    }
 
     // stage('Build-Docker') {
     //   when {not { expression { params.TERRAFORM_DELETE} }}

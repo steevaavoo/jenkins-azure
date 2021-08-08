@@ -11,7 +11,7 @@ terraform plan -out=tfplan
 Write-Output "FINISHED: $message."
 
 Write-Output "Terraform Plan - Generated on: $(Get-Date)`n" > diff.txt
-terraform show -no-color tfplan | Tee-Object -FilePath diff.txt
+terraform show -no-color tfplan | Tee-Object -FilePath diff.txt -Append
 
 # Revert to previous folder location
 Pop-Location
