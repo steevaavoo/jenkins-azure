@@ -121,12 +121,12 @@ pipeline {
       }
     }
 
-    // stage('Build-Docker') {
-    //   when {not { expression { params.TERRAFORM_DELETE} }}
-    //   steps {
-    //     pwsh(script: './scripts/Build-DockerImage.ps1')
-    //   }
-    // }
+    stage('Build-Docker-Image') {
+      when {not { expression { params.TERRAFORM_DELETE} }}
+      steps {
+        pwsh(script: './scripts/Build-DockerImage.ps1')
+      }
+    }
 
     // stage('Deploy-Kubernetes') {
     //   when {not { expression { params.TERRAFORM_DELETE} }}
